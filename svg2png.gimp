@@ -1,0 +1,26 @@
+#!/bin/bash
+# $Id: svg2png,v 1.1 2005/11/08 21:31:46 m Exp m $
+# Melchior FRANZ < mfranz # aon : at >   Public Domain
+
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+	echo "USAGE: `basename $0` <infile> [<outfile>]"
+	exit 0
+fi
+
+INFILE=${1:?}
+INFILE=${INFILE%.svg}.svg
+OUTFILE=${2:-$1}
+OUTFILE=${OUTFILE%.png}.png
+
+cat <<-EOF |gimp -i -c -d -f -b -
+	(let*
+		(
+			(img (car (gimp-file-load 1 "$INFILE" "$INFILE")))
+			(drawable (car (gimp-image-active-drawable img)))
+			(margin 8)
+		)
+		(gimp-file-save 1 img drawable "$OUTFILE" "$OUTFILE")
+	)
+	(gimp-quit 0)
+EOF
+
