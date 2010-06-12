@@ -13,6 +13,7 @@ class Error(Exception):
 	pass
 
 class SVG:
+	stack = []
 	indent = 0
 	default = {
 		'color':	'white',
@@ -81,6 +82,12 @@ class SVG:
 			else:
 				p[k] = v
 		return p
+
+	def push(self, attr):
+		self.stack.append(_group(self, attr))
+
+	def pop(self):
+		self.stack.pop()
 
 	def angle(self, alpha):
 		return alpha - 90
@@ -192,11 +199,11 @@ class instrument(SVG):
 		r = R(r)
 		self.write('<g transform="rotate(%s)">' % startangle)
 		self.write('<defs>')
-		self.write('    <path id="foo" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
+		self.write('<path id="foo" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
 		self.write('</defs>')
 		self.write('<text fill="%s" font-family="%s" font-size="%s">' \
 				% (color, font, R(size)))
-		self.write('    <textPath xlink:href="#foo">%s</textPath>' % text)
+		self.write('<textPath xlink:href="#foo">%s</textPath>' % text)
 		self.indent -= 1
 		self.write('</text>')
 		self.write('</g>')

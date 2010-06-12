@@ -38,9 +38,9 @@ try:
 
 	a.arctext(80, 210, "Better than MetaPost", size = 15, color = "lightblue", font = "Bitstream Vera Serif")
 
-	anArc = a.group("rotate(0)")
+	a.push("rotate(0)")
 	a.write('<path d="M0,-94 A94,94 0 0,1 94,0" fill="none" stroke-width="4.5" stroke="yellow" opacity="0.8"/>')
-	del anArc
+	a.pop()
 
 	a.arc(80, 2, 8, width = 10, color = "pink", opacity = 0.6)
 
