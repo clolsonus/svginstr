@@ -5,7 +5,8 @@ from math import ceil, sin, cos, pi
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
 __url__ = "http://members.aon.at/mfranz/flightgear/"
-__version__ = "$Id: svginstr.py,v 1.1 2005/11/08 21:22:28 m Exp m $; GPL v2"
+__version__ = "0.1"
+__license__ = "GPL v2"
 __doc__ = """
 """
 
@@ -20,12 +21,12 @@ class SVG:
 	stack = []
 	indent = 0
 	default = {
-		'color':	'white',
-		'opacity':	1,
-		'stroke-width':	1,
-		'font-family':	'Helvetica',
-		'font-size':	11,
-		'font-weight':	'normal',
+		'color': 'white',
+		'opacity': 1,
+		'stroke-width': 1,
+		'font-family': 'Helvetica',
+		'font-size': 11,
+		'font-weight': 'normal',
 	}
 
 	def __init__(self, filename, svg = ""):
