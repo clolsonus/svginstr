@@ -1,5 +1,6 @@
 export PYTHONPATH=../lib:$$PYTHONPATH
 
+
 UPDATE=@for konq in $$(dcop konqueror-*); do \
 		echo $$konq; \
 		for win in $$(dcop $$konq konqueror-mainwindow*); do \
@@ -14,13 +15,14 @@ UPDATE=@for konq in $$(dcop konqueror-*); do \
 		done \
 	done
 
-all: gsdi.svg test.svg clock.svg torque.svg arctest.svg
 
-%.svg: %.py
-	./$<
+all: gsdi.svg test.svg clock.svg torque.svg arctest.svg
 #	$(UPDATE)
 
 
+%.svg: %.py
+	./$<
+
+
 clean:
-	rm -f {torque,clock,test,arctest,gsdi,kclock}.{svg,xml} svginstr.pyc
-	rm -rf svginstr svginstr.tar.gz
+	rm -f *.svg *.xml
