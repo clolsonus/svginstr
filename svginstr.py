@@ -9,8 +9,12 @@ __version__ = "$Id: svginstr.py,v 1.1 2005/11/08 21:22:28 m Exp m $; GPL v2"
 __doc__ = """
 """
 
+
+
 class Error(Exception):
 	pass
+
+
 
 class SVG:
 	stack = []
@@ -93,8 +97,10 @@ class SVG:
 		return alpha - 90
 
 	def norm(self, a):
-		while (a < 0): a += 360
-		while (a >= 360): a -= 360
+		while (a < 0):
+			a += 360
+		while (a >= 360):
+			a -= 360
 		return a
 
 	def circle(self, radius, width, color = None, x = 0, y = 0, dic = {}):
@@ -120,7 +126,7 @@ class SVG:
 		_ = self.group("rotate(%s)" % R(b))
 		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
 				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"/>' %\
-				(r, 0, r, r, e/2, [0, 1][e >= 180], R(r * cosd(e)), R(r * sind(e)),
+				(r, 0, r, r, e / 2, [0, 1][e >= 180], R(r * cosd(e)), R(r * sind(e)),
 				p['stroke-width'], p['color'], p['opacity']))
 
 	def tick(self, a, b, alpha, width = None, color = None, opacity = None, dic = {}):
@@ -172,7 +178,6 @@ class _group:
 
 
 class instrument(SVG):
-
 	def __init__(self, filename, w, h = None, desc = None):
 		h = h or w
 		SVG.__init__(self, filename, 'width="%spx" height="%spx" viewBox="%s %s %s %s"' %\
@@ -198,9 +203,12 @@ class instrument(SVG):
 						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
 
 	def arctext(self, r, startangle, text, size = None, font = None, color = None):
-		if not font: font = self.font
-		if not size: size = self.size
-		if not color: color = self.color
+		if not font:
+			font = self.font
+		if not size:
+			size = self.size
+		if not color:
+			color = self.color
 		r = R(r)
 		self.write('<g transform="rotate(%s)">' % startangle)
 		self.write('<defs>')
@@ -275,15 +283,22 @@ def R(f, digits = 8):
 	else:
 		return str(r)
 
+
+
 def sind(a):
 	return sin(a * pi / 180)
+
+
 
 def cosd(a):
 	return cos(a * pi / 180)
 
+
+
 def position(a, b, n):
 	" from angle, to angle, number "
 	return [a + x * (float(b) - a) / n for x in range(n)] + [b]
+
 
 
 def frange(start, end = None, step = None):
@@ -302,6 +317,3 @@ def frange(start, end = None, step = None):
 		L[i] = start + i * step
 
 	return L
-
-
-
