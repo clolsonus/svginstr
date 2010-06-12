@@ -16,8 +16,18 @@ UPDATE=@for konq in $$(dcop konqueror-*); do \
 	done
 
 
-all: gsdi.svg test.svg clock.svg torque.svg arctest.svg
+all: svg
 #	$(UPDATE)
+
+
+svg: gsdi.svg test.svg clock.svg torque.svg arctest.svg
+
+
+png: gsdi.png test.png clock.png torque.png arctest.png
+
+
+%.png: %.svg
+	../bin/svg2png $<
 
 
 %.svg: %.py
@@ -26,3 +36,7 @@ all: gsdi.svg test.svg clock.svg torque.svg arctest.svg
 
 clean:
 	rm -f *.svg *.xml
+
+
+help:
+	@echo "targets: svg png clean help"
