@@ -1,1 +1,4 @@
 svginstr.tar.gz
+*.pyc
+*.svg
+*.xml
