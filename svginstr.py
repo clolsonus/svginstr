@@ -106,6 +106,11 @@ class SVG:
 		p = self.getparams(dic, {'color': color})
 		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"/>' % (R(x), R(y), R(radius), p['color']))
 
+	def square(self, width, color = None, x = 0, y = 0, dic = {}):
+		p = self.getparams(dic, {'color': color})
+		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
+				(R(x - 0.5 * width), R(y - 0.5 * width), R(width), R(width), color))
+
 	def arc(self, r, begin, end, width = None, color = None, opacity = None, dic = {}):
 		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
 		begin = self.angle(begin)
