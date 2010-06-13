@@ -5,7 +5,7 @@ import sys
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
 __url__ = "http://gitorious.org/svginstr/"
-__version__ = "0.1"
+__version__ = "0.2"
 __license__ = "GPL v2+"
 __doc__ = """
 """
@@ -16,10 +16,12 @@ try:
 	a.disc(98, 'black')
 
 	for i in range(0, 360, 20):
-		a.arc(98.0 * i / 360, 0, i, width = 2, color = "lightyellow")
-		a.arc(98.0 * i / 360 + 3, 2*i, i + 20, width = 2, color = "red")
+		a.arc(0, i, 98.0 * i / 360, width = 2, color = "lightyellow")
+		a.arc(2 * i, i + 20, 98.0 * i / 360 + 3, width = 2, color = "red")
 
-	a.arc(99, 0, 360-0.001, width = 2, color = "lightgreen")
+	a.arc(0, 360-0.001, 99, width = 2, color = "lightgreen")
+
+	a.at(50, 50).rectangle(50, 30, color = "green")
 
 
 except Error, e:

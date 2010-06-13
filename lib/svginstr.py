@@ -5,7 +5,7 @@ from math import ceil, sin, cos, pi
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
 __url__ = "http://gitorious.org/svginstr/"
-__version__ = "0.1"
+__version__ = "0.2"
 __license__ = "GPL v2"
 __doc__ = """
 """
@@ -18,8 +18,10 @@ class Error(Exception):
 
 
 class SVG:
-	stack = []
+	x = 0
+	y = 0
 	indent = 0
+	stack = []
 	default = {
 		'color': 'white',
 		'opacity': 1,
@@ -89,6 +91,10 @@ class SVG:
 				p[k] = v
 		return p
 
+	def group(self, trans):
+		" return a group class that has access to self "
+		return _group(self, trans)
+
 	def push(self, format):
 		self.stack.append(_group(self, format))
 
@@ -98,66 +104,87 @@ class SVG:
 	def angle(self, alpha):
 		return alpha - 90
 
-	def norm(self, a):
-		while (a < 0):
-			a += 360
-		while (a >= 360):
-			a -= 360
-		return a
-
-	def circle(self, radius, width, color = None, x = 0, y = 0, dic = {}):
+	# drawing primitives
+	def circle(self, radius, width, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
 		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s" stroke="%s"/>' \
-				% (R(x), R(y), R(radius), R(width), p['color']))
+				% (self.x, self.y, R(radius), R(width), p['color']))
+		self.at_origin()
 
-	def disc(self, radius, color = None, x = 0, y = 0, dic = {}):
+	def disc(self, radius, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
-		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"/>' % (R(x), R(y), R(radius), p['color']))
+		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"/>' % (self.x, self.y, R(radius), p['color']))
+		self.at_origin()
 
-	def square(self, width, color = None, x = 0, y = 0, dic = {}):
+	def rectangle(self, width, height, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
 		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
-				(R(x - 0.5 * width), R(y - 0.5 * width), R(width), R(width), color))
+				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), color))
+		self.at_origin()
 
-	def arc(self, r, begin, end, width = None, color = None, opacity = None, dic = {}):
+	def square(self, width, color = None, dic = {}):
+		self.rectangle(width, width, color, dic)
+
+	def text(self, text, size = None, font = None, color = None, dic = {}):
+		p = self.getparams(dic, {'color': color, 'font-family': font, '#font-size': size})
+		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
+				'text-anchor="middle">%s</text>' \
+				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], text))
+		self.indent -= 1
+		self.at_origin()
+
+	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
 		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
 		begin = self.angle(begin)
 		end = self.angle(end)
 		b = min(begin, end)
 		e = max(begin, end) - b
-		_ = self.group("rotate(%s)" % R(b))
+		if self.x == 0 and self.y == 0: # FIXME
+			trans = ""
+		else:
+			trans = "translate(%s %s) " % (self.x, self.y)
+		if radius == 0:
+			radius = 0.00000000001;
+		_ = self.group("%srotate(%s)" % (trans, R(b)))
 		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
 				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"/>' %\
-				(r, 0, r, r, e / 2, [0, 1][e >= 180], R(r * cosd(e)), R(r * sind(e)),
+				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
 				p['stroke-width'], p['color'], p['opacity']))
+		self.at_origin()
 
-	def tick(self, a, b, alpha, width = None, color = None, opacity = None, dic = {}):
+	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
 		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
-		_ = self.group("rotate(%s)" % R(self.angle(alpha)))
+		if self.x == 0 and self.y == 0: # FIXME
+			trans = ""
+		else:
+			trans = "translate(%s %s) " % (self.x, self.y)
+		_ = self.group("%srotate(%s)" % (trans, R(self.angle(alpha))))
 		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"/>' %\
-				(R(a), R(b), p['stroke-width'], p['color'], p['opacity']))
+				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity']))
+		self.at_origin()
 
-	def bullet(self, r, alpha, width, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color})
-		_ = self.group("rotate(%s)" % R(self.angle(alpha)))
-		self.disc(width, x = r, dic = p)
+	# positioning
+	def at_origin(self):
+		self.x = self.y = 0
+		return self
 
-	def text(self, x, y, text, size = None, font = None, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color, 'font-family': font, '#font-size': size})
-		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
-				'text-anchor="middle">%s</text>' \
-				% (R(x), R(y), p['font-family'], p['font-size'], p['font-weight'], p['color'], text))
-		self.indent -= 1
+	def at(self, x, y):
+		return self.at_origin().offset(x, y)
 
-	def ptext(self, alpha, radius, text, size = None, font = None, color = None, dic = {}):
-		a = self.angle(alpha)
-		x = radius * cosd(a)
-		y = radius * sind(a)
-		self.text(x, y, text, size, font, color, dic)
+	def at_polar(self, angle, radius):
+		return self.at_origin().polar_offset(angle, radius)
 
-	def group(self, trans):
-		" return a group class that has access to self "
-		return _group(self, trans)
+	def offset(self, x, y):
+		self.x += x
+		self.y += y
+		return self
+
+	def polar_offset(self, angle, radius):
+		"""first choose the azimuth (angle), then go the distance (radius)!"""
+		a = self.angle(angle)
+		self.x = radius * cosd(a)
+		self.y = radius * sind(a)
+		return self
 
 
 
@@ -204,7 +231,7 @@ class instrument(SVG):
 				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
 						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
 
-	def arctext(self, r, startangle, text, size = None, font = None, color = None):
+	def arctext(self, startangle, r, text, size = None, font = None, color = None):
 		if not font:
 			font = self.font
 		if not size:
@@ -319,3 +346,12 @@ def frange(start, end = None, step = None):
 		L[i] = start + i * step
 
 	return L
+
+
+
+def norm_angle(self, a):
+	while (a < 0):
+		a += 360
+	while (a >= 360):
+		a -= 360
+	return a

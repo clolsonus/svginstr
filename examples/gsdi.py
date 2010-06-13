@@ -5,7 +5,7 @@ import sys
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
 __url__ = "http://gitorious.org/svginstr/"
-__version__ = "0.1"
+__version__ = "0.2"
 __license__ = "GPL v2+"
 __doc__ = """
 """
@@ -17,7 +17,7 @@ try:
 	a.circle(11, 4)
 
 	for i in range(12):
-		a.tick(77, 93, 30 * i, 4)
+		a.tick(30 * i, 77, 93, 4)
 
 
 except Error, e:
