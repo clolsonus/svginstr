@@ -4,7 +4,7 @@ import sys, gzip
 from math import ceil, sin, cos, pi
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
-__url__ = "http://members.aon.at/mfranz/flightgear/"
+__url__ = "http://gitorious.org/svginstr/"
 __version__ = "0.1"
 __license__ = "GPL v2"
 __doc__ = """
@@ -181,7 +181,7 @@ class _group:
 class instrument(SVG):
 	def __init__(self, filename, w, h = None, desc = None):
 		h = h or w
-		SVG.__init__(self, filename, 'width="%spx" height="%spx" viewBox="%s %s %s %s"' %\
+		SVG.__init__(self, filename, 'width="%spx" height="%spx" viewBox="%s %s %s %s"' % \
 				(R(w), R(h), 0, 0, 200, 200))
 		if desc:
 			self.description(desc)
@@ -200,7 +200,7 @@ class instrument(SVG):
 			for x in range(20):
 				if (x + y) & 1:
 					continue
-				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' %\
+				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
 						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
 
 	def arctext(self, r, startangle, text, size = None, font = None, color = None):

@@ -35,7 +35,7 @@ png: gsdi.png test.png clock.png torque.png arctest.png
 
 
 clean:
-	rm -f *.svg *.xml
+	rm -f *.svg *.xml *.png
 
 
 help:

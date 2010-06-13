@@ -1,5 +1,4 @@
 #!/bin/bash
-# $Id: svg2png,v 1.1 2005/11/08 21:31:46 m Exp m $
 # Melchior FRANZ < mfranz # aon : at >   Public Domain
 
 if [ $# -lt 1 ] || [ $# -gt 2 ]; then
