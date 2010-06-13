@@ -31,7 +31,7 @@ class SVG:
 
 	def __init__(self, filename, svg = ""):
 		try:
-			if filename.endswith(".svgz"):
+			if filename.endswith(".svgz") or filename.endswith(".svg.gz"):
 				self.file = gzip.GzipFile(filename, "w")
 			else:
 				self.file = open(filename, "w")
