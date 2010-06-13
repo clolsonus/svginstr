@@ -89,8 +89,8 @@ class SVG:
 				p[k] = v
 		return p
 
-	def push(self, attr):
-		self.stack.append(_group(self, attr))
+	def push(self, format):
+		self.stack.append(_group(self, format))
 
 	def pop(self):
 		self.stack.pop()
