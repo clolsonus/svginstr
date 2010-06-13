@@ -37,6 +37,7 @@ class SVG:
 				self.file = open(filename, "w")
 			self.write('<?xml version="1.0" standalone="no"?>')
 			self.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
+			self.write()
 			self.write('<svg %s xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' % svg)
 
 		except IOError, (errno, strerror):
@@ -50,7 +51,7 @@ class SVG:
 		except IOError, (errno, strerror):
 			raise Error("I/O error(%s): %s" % (errno, strerror))
 
-	def write(self, s):
+	def write(self, s = ""):
 		try:
 			s = s.strip()
 			if s.startswith('<?') or s.startswith('<!'):
