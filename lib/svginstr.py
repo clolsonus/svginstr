@@ -1,6 +1,6 @@
 #!python
 
-import sys, gzip
+import sys, gzip, string
 from math import ceil, sin, cos, pi
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
@@ -16,11 +16,8 @@ class Error(Exception):
 	pass
 
 
+
 class SVG:
-	x = 0
-	y = 0
-	indent = 0
-	stack = []
 	default = {
 		'color': 'white',
 		'opacity': 1,
@@ -31,29 +28,47 @@ class SVG:
 	}
 
 	def __init__(self, filename, svg = ""):
+		self.x = 0
+		self.y = 0
+		self.indent = 0
+		self.stack = []
+		self.defs = []
+		self.contents = []
+		self.reset()
+
 		try:
 			if filename.endswith(".svgz") or filename.endswith(".svg.gz"):
 				self.file = gzip.GzipFile(filename, "w")
 			else:
 				self.file = open(filename, "w")
-			self.write('<?xml version="1.0" standalone="no"?>')
-			self.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
-			self.write()
-			self.write('<svg %s xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' % svg)
-			self.defs = []
+			self._write('<?xml version="1.0" standalone="no"?>')
+			self._write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
+			self._write()
+			self._write('<svg %s xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' % svg)
 
 		except IOError, (errno, strerror):
 			raise Error("I/O error(%s): %s" % (errno, strerror))
 
 	def __del__(self):
 		try:
-			self.write("</svg>\n")
+			if self.defs:
+				self._write("<defs>")
+				for d in self.defs:
+					for i in d.code():
+						self._write(i)
+				self._write("</defs>")
+
+			for i in self.contents:
+				self._write(i)
+
+			self._write("</svg>\n")
 			self.file.close()
 
 		except IOError, (errno, strerror):
 			raise Error("I/O error(%s): %s" % (errno, strerror))
 
-	def write(self, s = ""):
+	def _write(self, s = ""):
+		""" For internal purposes only. Don't use from outside! """
 		try:
 			s = s.strip()
 			if s.startswith('<?') or s.startswith('<!'):
@@ -71,8 +86,11 @@ class SVG:
 		except IOError, (errno, strerror):
 			raise Error("I/O error(%s): %s" % (errno, strerror))
 
+	def write(self, s = ""):
+		self.contents.append(s)
+
 	def description(self, s):
-		self.write('<desc>%s</desc>' % s)
+		self._write('<desc>%s</desc>' % s)
 		self.indent -= 1
 
 	def set(self, dic):
@@ -104,23 +122,33 @@ class SVG:
 	def angle(self, alpha):
 		return alpha - 90
 
+	def reset(self):
+		self.at_origin()
+		self.style = []
+
+	def _style(self):
+		if self.style:
+			return " style=\"%s\"" % (string.join(self.style, "; "))
+		return ""
+
 	# drawing primitives
 	def circle(self, radius, width, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
-		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s" stroke="%s"/>' \
-				% (self.x, self.y, R(radius), R(width), p['color']))
-		self.at_origin()
+		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s" stroke="%s"%s/>' \
+				% (self.x, self.y, R(radius), R(width), p['color'], self._style()))
+		self.reset()
 
 	def disc(self, radius, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
-		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"/>' % (self.x, self.y, R(radius), p['color']))
-		self.at_origin()
+		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"%s/>' \
+				% (self.x, self.y, R(radius), p['color'], self._style()))
+		self.reset()
 
 	def rectangle(self, width, height, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
-		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
-				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), color))
-		self.at_origin()
+		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"%s/>' % \
+				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), color, self._style()))
+		self.reset()
 
 	def square(self, width, color = None, dic = {}):
 		self.rectangle(width, width, color, dic)
@@ -128,10 +156,11 @@ class SVG:
 	def text(self, text, size = None, font = None, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color, 'font-family': font, '#font-size': size})
 		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
-				'text-anchor="middle">%s</text>' \
-				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], text))
+				'text-anchor="middle"%s>%s</text>' \
+				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], \
+				text, self._style()))
 		self.indent -= 1
-		self.at_origin()
+		self.reset()
 
 	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
 		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
@@ -147,10 +176,10 @@ class SVG:
 			radius = 0.00000000001;
 		_ = self.group("%srotate(%s)" % (trans, R(b)))
 		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
-				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"/>' %\
+				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
 				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
-				p['stroke-width'], p['color'], p['opacity']))
-		self.at_origin()
+				p['stroke-width'], p['color'], p['opacity'], self._style()))
+		self.reset()
 
 	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
 		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
@@ -159,9 +188,9 @@ class SVG:
 		else:
 			trans = "translate(%s %s) " % (self.x, self.y)
 		_ = self.group("%srotate(%s)" % (trans, R(self.angle(alpha))))
-		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"/>' %\
-				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity']))
-		self.at_origin()
+		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
+				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], self._style()))
+		self.reset()
 
 	# positioning
 	def at_origin(self):
@@ -184,6 +213,12 @@ class SVG:
 		a = self.angle(angle)
 		self.x = radius * cosd(a)
 		self.y = radius * sind(a)
+		return self
+
+	# style
+	def gradient(self, gradient):
+		self.defs.append(gradient)
+		self.style.append("fill:url(#%s)" % gradient.name)
 		return self
 
 
@@ -277,8 +312,8 @@ class Instrument(SVG):
 		self.write('</g>')
 		SVG.__del__(self)
 
-	def write(self, s = ""):
-		SVG.write(self, s)
+	#def write(self, s = ""):
+	#	SVG.write(self, s)
 
 	def chequer(self, size = 10, color = "lightgrey"):
 		" fake transparency  ;-) "
