@@ -12,7 +12,7 @@ __doc__ = """
 
 
 try:
-	a = instrument("clock.svg", 512, 512, "Bo105 clock; " + __version__)
+	a = Instrument("clock.svg", 512, 512, "Bo105 clock; " + __version__)
 	a.disc(98, 'black')
 	a.circle(4, 3)
 

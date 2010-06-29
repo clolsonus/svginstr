@@ -12,7 +12,7 @@ __doc__ = """
 
 
 try:
-	a = instrument("gsdi.svg", 512, 512, "Bo105 Ground Speed Drift Indicator; " + __version__)
+	a = Instrument("gsdi.svg", 512, 512, "Bo105 Ground Speed Drift Indicator; " + __version__)
 	a.disc(98, 'black')
 	a.circle(11, 4)
 

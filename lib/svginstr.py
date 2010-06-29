@@ -261,7 +261,7 @@ class RadialGradient(Gradient):
 
 
 
-class instrument(SVG):
+class Instrument(SVG):
 	def __init__(self, filename, w, h = None, desc = None):
 		h = h or w
 		SVG.__init__(self, filename, 'width="%spx" height="%spx" viewBox="%s %s %s %s"' % \
@@ -315,7 +315,7 @@ class instrument(SVG):
 
 class _xml:
 	def __init__(self, parent, filename):
-		if not isinstance(parent, instrument):
+		if not isinstance(parent, Instrument):
 			self.instrument = None
 			raise ValueError("_xml is only available as method of instrument")
 		self.instrument = parent

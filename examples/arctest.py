@@ -12,7 +12,7 @@ __doc__ = """
 
 
 try:
-	a = instrument("arctest.svg", 512, 512, "arctest")
+	a = Instrument("arctest.svg", 512, 512, "arctest")
 	a.disc(98, 'black')
 
 	for i in range(0, 360, 20):

@@ -12,7 +12,7 @@ __doc__ = """
 
 
 try:
-	a = instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
+	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 	a.disc(98, 'black')
 
 	a.angle = lambda x: 230.0 * (x - 60) / 120 - 90

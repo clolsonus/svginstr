@@ -12,7 +12,7 @@ __doc__ = """
 
 
 try:
-	a = instrument("test.svg", 512, 512, "test face; " + __version__)
+	a = Instrument("test.svg", 512, 512, "test face; " + __version__)
 	a.disc(98, color = 'black')
 	a.disc(1)
 
