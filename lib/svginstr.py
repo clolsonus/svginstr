@@ -80,7 +80,9 @@ class SVG:
 
 			self.file.write(self.indent * '\t' + s + '\n')
 
-			if s.startswith('<') and not s.startswith('</') and not s.endswith('/>'):
+			if s.startswith('<') and s.find('</') > 0:
+				pass
+			elif s.startswith('<') and not s.startswith('</') and not s.endswith('/>'):
 				self.indent += 1
 
 		except IOError, (errno, strerror):
@@ -91,7 +93,6 @@ class SVG:
 
 	def description(self, s):
 		self._write('<desc>%s</desc>' % s)
-		self.indent -= 1
 
 	def set(self, dic):
 		self.default.update(dic)
@@ -159,7 +160,6 @@ class SVG:
 				'text-anchor="middle"%s>%s</text>' \
 				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], \
 				self._style(), text))
-		self.indent -= 1
 		self.reset()
 
 	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
