@@ -128,7 +128,7 @@ class SVG:
 
 	def _style(self):
 		if self.style:
-			return " style=\"%s\"" % (string.join(self.style, "; "))
+			return " style=\"%s\"" % string.join(self.style, "; ")
 		return ""
 
 	# drawing primitives
@@ -158,7 +158,7 @@ class SVG:
 		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
 				'text-anchor="middle"%s>%s</text>' \
 				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], \
-				text, self._style()))
+				self._style(), text))
 		self.indent -= 1
 		self.reset()
 
