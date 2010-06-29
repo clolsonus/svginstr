@@ -261,7 +261,7 @@ class Gradient:
 
 
 class LinearGradient(Gradient):
-	def __init__(self, x1 = None, y1 = None, x2 = None, y2 = None):
+	def __init__(self, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "100%"):
 		Gradient.__init__(self)
 		self.x1, self.y1, self.x2, self.y2 = x1, y1, x2, y2
 
@@ -279,8 +279,12 @@ class LinearGradient(Gradient):
 
 
 class RadialGradient(Gradient):
-	def __init__(self, cx = None, cy = None, r = None, fx = None, fy = None):
+	def __init__(self, cx = "50%", cy = "50%", r = "50%", fx = None, fy = None):
 		Gradient.__init__(self)
+		if fx == None:
+			fx = cx
+		if fy == None:
+			fy = cy
 		self.cx, self.cy, self.r, self.fx, self.fy = cx, cy, r, fx, fy
 
 	def copy(self):
