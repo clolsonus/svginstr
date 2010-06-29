@@ -17,6 +17,65 @@ class Error(Exception):
 
 
 
+class Gradient:
+	counter = 0
+
+	def __init__(self):
+		self.bands = []
+		self.refs = 0
+		Gradient.counter += 1
+		self.name = "gradient%d" % Gradient.counter
+
+	def color(self, offset, r, g, b, a = 1):
+		self.bands.append((offset, r, g, b, a))
+		return self
+
+	def code(self):
+		return ["<stop offset=\"%s\" style=\"stop-color:rgb(%s, %s, %s); stop-opacity:%s\"/>" \
+				% b for b in self.bands]
+
+
+
+class LinearGradient(Gradient):
+	def __init__(self, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "100%"):
+		Gradient.__init__(self)
+		self.x1, self.y1, self.x2, self.y2 = x1, y1, x2, y2
+
+	def copy(self):
+		c = LinearGradient(self.x1, self.y1, self.x2, self.y2)
+		c.bands = self.bands[:]
+		return c
+
+	def code(self):
+		self.refs += 1
+		return ["<linearGradient id=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\">" \
+				% (self.name, self.x1, self.y1, self.x2, self.y2)] \
+				+ Gradient.code(self) + ["</linearGradient>"]
+
+
+
+class RadialGradient(Gradient):
+	def __init__(self, cx = "50%", cy = "50%", r = "50%", fx = None, fy = None):
+		Gradient.__init__(self)
+		if fx == None:
+			fx = cx
+		if fy == None:
+			fy = cy
+		self.cx, self.cy, self.r, self.fx, self.fy = cx, cy, r, fx, fy
+
+	def copy(self):
+		c = RadialGradient(self.cx, self.cy, self.r, self.fx, self.fy)
+		c.bands = self.bands[:]
+		return c
+
+	def code(self):
+		self.refs += 1
+		return ["<radialGradient id=\"%s\" cx=\"%s\" cy=\"%s\" r=\"%s\" fx=\"%s\" fy=\"%s\">" \
+				% (self.name, self.cx, self.cy, self.r, self.fx, self.fy)] \
+				+ Gradient.code(self) + ["</radialGradient>"]
+
+
+
 class SVG:
 	default = {
 		'color': 'white',
@@ -238,65 +297,6 @@ class _group:
 	def __del__(self):
 		if self.svg:
 			self.svg.write('</g>')
-
-
-
-class Gradient:
-	counter = 0
-
-	def __init__(self):
-		self.bands = []
-		self.refs = 0
-		Gradient.counter += 1
-		self.name = "gradient%d" % Gradient.counter
-
-	def color(self, offset, r, g, b, a = 1):
-		self.bands.append((offset, r, g, b, a))
-		return self
-
-	def code(self):
-		return ["<stop offset=\"%s\" style=\"stop-color:rgb(%s, %s, %s); stop-opacity:%s\"/>" \
-				% b for b in self.bands]
-
-
-
-class LinearGradient(Gradient):
-	def __init__(self, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "100%"):
-		Gradient.__init__(self)
-		self.x1, self.y1, self.x2, self.y2 = x1, y1, x2, y2
-
-	def copy(self):
-		c = LinearGradient(self.x1, self.y1, self.x2, self.y2)
-		c.bands = self.bands[:]
-		return c
-
-	def code(self):
-		self.refs += 1
-		return ["<linearGradient id=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\">" \
-				% (self.name, self.x1, self.y1, self.x2, self.y2)] \
-				+ Gradient.code(self) + ["</linearGradient>"]
-
-
-
-class RadialGradient(Gradient):
-	def __init__(self, cx = "50%", cy = "50%", r = "50%", fx = None, fy = None):
-		Gradient.__init__(self)
-		if fx == None:
-			fx = cx
-		if fy == None:
-			fy = cy
-		self.cx, self.cy, self.r, self.fx, self.fy = cx, cy, r, fx, fy
-
-	def copy(self):
-		c = RadialGradient(self.cx, self.cy, self.r, self.fx, self.fy)
-		c.bands = self.bands[:]
-		return c
-
-	def code(self):
-		self.refs += 1
-		return ["<radialGradient id=\"%s\" cx=\"%s\" cy=\"%s\" r=\"%s\" fx=\"%s\" fy=\"%s\">" \
-				% (self.name, self.cx, self.cy, self.r, self.fx, self.fy)] \
-				+ Gradient.code(self) + ["</radialGradient>"]
 
 
 
