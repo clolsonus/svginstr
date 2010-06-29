@@ -1,5 +1,8 @@
 export PYTHONPATH=../lib:$$PYTHONPATH
 
+PYFILES=$(wildcard *.py)
+SVGFILES=$(PYFILES:.py=.svg)
+PNGFILES=$(PYFILES:.py=.png)
 
 UPDATE=@for konq in $$(dcop konqueror-*); do \
 		echo $$konq; \
@@ -20,10 +23,10 @@ all: svg
 #	$(UPDATE)
 
 
-svg: gsdi.svg test.svg clock.svg torque.svg arctest.svg
+svg: $(SVGFILES)
 
 
-png: gsdi.png test.png clock.png torque.png arctest.png
+png: $(PNGFILES)
 
 
 %.png: %.svg
@@ -34,9 +37,14 @@ png: gsdi.png test.png clock.png torque.png arctest.png
 	./$<
 
 
+check: $(SVGFILES)
+	@echo -e "\nchecking ..."
+	@for i in $(SVGFILES); do echo -en "\t$$i ... "; xmllint $$i >/dev/null && echo OK; done
+
+
 clean:
 	rm -f *.svg *.xml *.png
 
 
 help:
-	@echo "targets: svg png clean help"
+	@echo "targets: svg png check clean help"
