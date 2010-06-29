@@ -16,7 +16,6 @@ class Error(Exception):
 	pass
 
 
-
 class SVG:
 	x = 0
 	y = 0
@@ -41,6 +40,7 @@ class SVG:
 			self.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
 			self.write()
 			self.write('<svg %s xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' % svg)
+			self.defs = []
 
 		except IOError, (errno, strerror):
 			raise Error("I/O error(%s): %s" % (errno, strerror))
@@ -206,6 +206,61 @@ class _group:
 
 
 
+class Gradient:
+	counter = 0
+
+	def __init__(self):
+		self.bands = []
+		self.refs = 0
+		Gradient.counter += 1
+		self.name = "gradient%d" % Gradient.counter
+
+	def color(self, offset, r, g, b, a = 1):
+		self.bands.append((offset, r, g, b, a))
+		return self
+
+	def code(self):
+		return ["<stop offset=\"%s\" style=\"stop-color:rgb(%s, %s, %s); stop-opacity:%s\"/>" \
+				% b for b in self.bands]
+
+
+
+class LinearGradient(Gradient):
+	def __init__(self, x1 = None, y1 = None, x2 = None, y2 = None):
+		Gradient.__init__(self)
+		self.x1, self.y1, self.x2, self.y2 = x1, y1, x2, y2
+
+	def copy(self):
+		c = LinearGradient(self.x1, self.y1, self.x2, self.y2)
+		c.bands = self.bands[:]
+		return c
+
+	def code(self):
+		self.refs += 1
+		return ["<linearGradient id=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\">" \
+				% (self.name, self.x1, self.y1, self.x2, self.y2)] \
+				+ Gradient.code(self) + ["</linearGradient>"]
+
+
+
+class RadialGradient(Gradient):
+	def __init__(self, cx = None, cy = None, r = None, fx = None, fy = None):
+		Gradient.__init__(self)
+		self.cx, self.cy, self.r, self.fx, self.fy = cx, cy, r, fx, fy
+
+	def copy(self):
+		c = RadialGradient(self.cx, self.cy, self.r, self.fx, self.fy)
+		c.bands = self.bands[:]
+		return c
+
+	def code(self):
+		self.refs += 1
+		return ["<radialGradient id=\"%s\" cx=\"%s\" cy=\"%s\" r=\"%s\" fx=\"%s\" fy=\"%s\">" \
+				% (self.name, self.cx, self.cy, self.r, self.fx, self.fy)] \
+				+ Gradient.code(self) + ["</radialGradient>"]
+
+
+
 class instrument(SVG):
 	def __init__(self, filename, w, h = None, desc = None):
 		h = h or w
@@ -221,6 +276,9 @@ class instrument(SVG):
 	def __del__(self):
 		self.write('</g>')
 		SVG.__del__(self)
+
+	def write(self, s = ""):
+		SVG.write(self, s)
 
 	def chequer(self, size = 10, color = "lightgrey"):
 		" fake transparency  ;-) "
