@@ -21,18 +21,21 @@ class Gradient:
 	counter = 0
 
 	def __init__(self):
-		self.bands = []
-		self.refs = 0
+		self.stops = []
 		Gradient.counter += 1
 		self.name = "gradient%d" % Gradient.counter
 
-	def color(self, offset, r, g, b, a = 1):
-		self.bands.append((offset, r, g, b, a))
+	def stop(self, offset, red, green = None, blue = None, alpha = 1):
+		if green == None:
+			green = red
+		if blue == None:
+			blue = green
+		self.stops.append((offset, red, green, blue, alpha))
 		return self
 
 	def code(self):
 		return ["<stop offset=\"%s\" style=\"stop-color:rgb(%s, %s, %s); stop-opacity:%s\"/>" \
-				% b for b in self.bands]
+				% b for b in self.stops]
 
 
 
@@ -43,11 +46,10 @@ class LinearGradient(Gradient):
 
 	def copy(self):
 		c = LinearGradient(self.x1, self.y1, self.x2, self.y2)
-		c.bands = self.bands[:]
+		c.stops = self.stops[:]
 		return c
 
 	def code(self):
-		self.refs += 1
 		return ["<linearGradient id=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\">" \
 				% (self.name, self.x1, self.y1, self.x2, self.y2)] \
 				+ Gradient.code(self) + ["</linearGradient>"]
@@ -65,11 +67,10 @@ class RadialGradient(Gradient):
 
 	def copy(self):
 		c = RadialGradient(self.cx, self.cy, self.r, self.fx, self.fy)
-		c.bands = self.bands[:]
+		c.stops = self.stops[:]
 		return c
 
 	def code(self):
-		self.refs += 1
 		return ["<radialGradient id=\"%s\" cx=\"%s\" cy=\"%s\" r=\"%s\" fx=\"%s\" fy=\"%s\">" \
 				% (self.name, self.cx, self.cy, self.r, self.fx, self.fy)] \
 				+ Gradient.code(self) + ["</radialGradient>"]

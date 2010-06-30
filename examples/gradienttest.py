@@ -14,15 +14,15 @@ __doc__ = """
 try:
 	# applying color() methods separately ...
 	linear = LinearGradient("0%", "0%", "0%", "100%")
-	linear.color("0%", 13, 30, 40)
-	linear.color("49%", 51, 132, 179)
-	linear.color("49%", 255, 255, 255)
-	linear.color("51%", 255, 255, 255)
-	linear.color("51%", 216, 140, 30)
-	linear.color("100%", 78, 55, 24)
+	linear.stop("0%", 13, 30, 40)
+	linear.stop("49%", 51, 132, 179)
+	linear.stop("49%", 255, 255, 255)
+	linear.stop("51%", 255, 255, 255)
+	linear.stop("51%", 216, 140, 30)
+	linear.stop("100%", 78, 55, 24)
 
 	# or concatenating them
-	radial = RadialGradient("50%", "50%", "50%", "50%", "50%").color("0%", 230, 200, 0).color("100%", 0, 100, 0)
+	radial = RadialGradient("50%", "50%", "50%", "50%", "50%").stop("0%", 230, 200, 0).stop("100%", 0, 100, 0)
 
 	a = Instrument("gradienttest.svg", 512, 512, "Gradient Test; " + __version__)
 	a.gradient(radial).disc(98)
