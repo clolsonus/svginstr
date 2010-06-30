@@ -151,6 +151,9 @@ class SVG:
 	def write(self, s = ""):
 		self.contents.append(s)
 
+	def title(self, s):
+		self._write('<title>%s</title>' % s)
+
 	def description(self, s):
 		self._write('<desc>%s</desc>' % s)
 
@@ -252,7 +255,8 @@ class SVG:
 				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], self._style()))
 		self.reset()
 
-	# positioning
+
+	# positioning methods
 	def at_origin(self):
 		self.x = self.y = 0
 		return self
