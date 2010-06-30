@@ -317,9 +317,6 @@ class Instrument(SVG):
 		self.write('</g>')
 		SVG.__del__(self)
 
-	#def write(self, s = ""):
-	#	SVG.write(self, s)
-
 	def chequer(self, size = 10, color = "lightgrey"):
 		" fake transparency  ;-) "
 		for y in range(20):

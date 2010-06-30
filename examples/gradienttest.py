@@ -26,7 +26,7 @@ try:
 
 	a = Instrument("gradienttest.svg", 512, 512, "Gradient Test; " + __version__)
 	a.gradient(radial).disc(98)
-	a.gradient(linear).circle(11, 4)
+	a.circle(11, 4)
 
 	a.at(50, 50).gradient(linear).rectangle(90, 70)
 
