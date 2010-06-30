@@ -12,14 +12,14 @@ __doc__ = """
 
 
 try:
-	# applying color() methods separately ...
-	linear = LinearGradient("0%", "0%", "0%", "100%")
-	linear.stop("0%", 13, 30, 40)
-	linear.stop("49%", 51, 132, 179)
-	linear.stop("49%", 255, 255, 255)
-	linear.stop("51%", 255, 255, 255)
-	linear.stop("51%", 216, 140, 30)
-	linear.stop("100%", 78, 55, 24)
+	# applying stop() methods separately ...
+	horizon = LinearGradient("0%", "0%", "0%", "100%")
+	horizon.stop("0%", 13, 30, 40)
+	horizon.stop("49%", 51, 132, 179)
+	horizon.stop("49%", 255, 255, 255)
+	horizon.stop("51%", 255, 255, 255)
+	horizon.stop("51%", 216, 140, 30)
+	horizon.stop("100%", 78, 55, 24)
 
 	# or concatenating them
 	radial = RadialGradient("50%", "50%", "50%", "50%", "50%").stop("0%", 230, 200, 0).stop("100%", 0, 100, 0)
@@ -28,7 +28,7 @@ try:
 	a.gradient(radial).disc(98)
 	a.circle(11, 4)
 
-	a.at(50, 50).gradient(linear).rectangle(90, 70)
+	a.at(50, 50).gradient(horizon).rectangle(90, 70)
 
 	for i in range(12):
 		a.tick(30 * i, 77, 93, 4)
