@@ -188,11 +188,11 @@ class SVG:
 
 	def reset(self):
 		self.at_origin()
-		self.style = []
+		self.styles = []
 
 	def _style(self):
-		if self.style:
-			return " style=\"%s\"" % string.join(self.style, "; ")
+		if self.styles:
+			return " style=\"%s\"" % string.join(self.styles, "; ")
 		return ""
 
 	# drawing primitives
@@ -279,11 +279,15 @@ class SVG:
 		self.y = radius * sind(a)
 		return self
 
-	# style
-	def gradient(self, gradient):
-		self.defs.append(gradient)
-		self.style.append("fill:url(#%s)" % gradient.name)
+
+	# style methods
+	def style(self, s):
+		self.styles.append(s)
 		return self
+
+	def gradient(self, g):
+		self.defs.append(g)
+		return self.style("fill:url(#%s)" % g.name)
 
 
 
