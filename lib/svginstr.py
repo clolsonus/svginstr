@@ -2,6 +2,7 @@
 
 import sys, gzip, string
 from math import ceil, sin, cos, pi
+from random import random
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
 __url__ = "http://gitorious.org/svginstr/"
@@ -417,15 +418,16 @@ class Instrument(SVG):
 		self.write('</text>')
 		self.write('</g>')
 
-	def screw(self, scale, rot):
+	def screw(self, scale, rot = None):
 		g = RadialGradient("50%", "50%", "50%", "50%", "50%")
 		g.stop("0%", 24)
 		g.stop("45%",24)
 		g.stop("50%", 30)
 		g.stop("50%", 10, alpha = 1)
-		g.stop("70%", 30, alpha = 0.1)
-		g.stop("100%", 0, alpha = 0)
+		g.stop("77%", 30, alpha = 0)
 
+		if rot == None:
+			rot = random() * 180
 		x, y = self.x, self.y
 		self.at_origin()
 		self.translate(x, y).push()
