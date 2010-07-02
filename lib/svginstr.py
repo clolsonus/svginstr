@@ -417,6 +417,25 @@ class Instrument(SVG):
 		self.write('</text>')
 		self.write('</g>')
 
+	def screw(self, scale, rot):
+		g = RadialGradient("50%", "50%", "50%", "50%", "50%")
+		g.stop("0%", 24)
+		g.stop("45%",24)
+		g.stop("50%", 30)
+		g.stop("50%", 10, alpha = 1)
+		g.stop("70%", 30, alpha = 0.1)
+		g.stop("100%", 0, alpha = 0)
+
+		x, y = self.x, self.y
+		self.at_origin()
+		self.translate(x, y).push()
+		self.rotate(rot).scale(scale).push()
+		self.gradient(g).disc(100)
+		self.rectangle(100, 16, color = "#141414")
+		self.pop()
+		self.pop()
+		self.reset()
+
 	def xml(self, name):
 		return _xml(self, name)
 

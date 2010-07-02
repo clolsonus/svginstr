@@ -42,6 +42,8 @@ try:
 	a.at(0, 55).text("%", 17)
 	a.at(0, 75).text("TORQUE", 20)
 
+	a.at(0, -30).screw(0.1, 30)
+	a.at(0, 30).screw(0.1, 80)
 	a.disc(8, 'black')
 
 	a.disc(0.4, 'red')
