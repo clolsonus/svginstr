@@ -434,7 +434,6 @@ class Instrument(SVG):
 		self.rectangle(100, 16, color = "#141414")
 		self.pop()
 		self.pop()
-		self.reset()
 
 	def xml(self, name):
 		return _xml(self, name)
