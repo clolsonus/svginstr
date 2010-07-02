@@ -17,6 +17,12 @@ class Error(Exception):
 
 
 
+class Global:
+	transform = []
+	style = []
+
+
+
 class Gradient:
 	counter = 0
 
@@ -93,6 +99,7 @@ class SVG:
 		self.indent = 0
 		self.stack = []
 		self.defs = []
+		self.trans = []
 		self.contents = []
 		self.reset()
 
@@ -177,8 +184,9 @@ class SVG:
 		" return a group class that has access to self "
 		return _group(self, trans)
 
-	def push(self, format):
-		self.stack.append(_group(self, format))
+	def push(self):
+		self.stack.append(_group(self, string.join(self.trans)))
+		self.trans = []
 
 	def pop(self):
 		self.stack.pop()
@@ -189,29 +197,29 @@ class SVG:
 	def reset(self):
 		self.at_origin()
 		self.styles = []
+		self.trans = []
 
-	def _style(self):
-		if self.styles:
-			return " style=\"%s\"" % string.join(self.styles, "; ")
-		return ""
+	def _attrib(self):
+		return string.join([self._style(), self._trans()], " ")
 
 	# drawing primitives
 	def circle(self, radius, width, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
 		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s" stroke="%s"%s/>' \
-				% (self.x, self.y, R(radius), R(width), p['color'], self._style()))
+				% (self.x, self.y, R(radius), R(width), p['color'], self._attrib()))
 		self.reset()
 
 	def disc(self, radius, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
 		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"%s/>' \
-				% (self.x, self.y, R(radius), p['color'], self._style()))
+				% (self.x, self.y, R(radius), p['color'], self._attrib()))
 		self.reset()
 
 	def rectangle(self, width, height, color = None, dic = {}):
 		p = self.getparams(dic, {'color': color})
 		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"%s/>' % \
-				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), color, self._style()))
+				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), \
+				color, self._attrib()))
 		self.reset()
 
 	def square(self, width, color = None, dic = {}):
@@ -222,7 +230,7 @@ class SVG:
 		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
 				'text-anchor="middle"%s>%s</text>' \
 				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], \
-				self._style(), text))
+				self._attrib(), text))
 		self.reset()
 
 	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
@@ -241,7 +249,7 @@ class SVG:
 		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
 				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
 				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
-				p['stroke-width'], p['color'], p['opacity'], self._style()))
+				p['stroke-width'], p['color'], p['opacity'], self._attrib()))
 		self.reset()
 
 	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
@@ -252,7 +260,7 @@ class SVG:
 			trans = "translate(%s %s) " % (self.x, self.y)
 		_ = self.group("%srotate(%s)" % (trans, R(self.angle(alpha))))
 		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
-				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], self._style()))
+				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], self._attrib()))
 		self.reset()
 
 
@@ -281,13 +289,69 @@ class SVG:
 
 
 	# style methods
+	def _style(self):
+		""" return assembled style """
+		t = Global.style + self.styles
+		if t:
+			return " style=\"%s\"" % string.join(t, "; ")
+		else:
+			return ""
+
 	def style(self, s):
+		""" add one style """
 		self.styles.append(s)
 		return self
 
-	def gradient(self, g):
+	def gradient(self, g, name = None):
 		self.defs.append(g)
-		return self.style("fill:url(#%s)" % g.name)
+		return self.style("fill:url(#%s)" % (name or g.name))
+
+
+	# transform methods
+	def _trans(self):
+		""" return assembled transformation """
+		t = Global.transform + self.trans
+		if t:
+			return " transform=\"%s\"" % string.join(t, " ")
+		else:
+			return ""
+
+	def translate(self, x, y = None):
+		self.trans.append("translate(%s, %s)" % (x, y or 0))
+		return self
+
+	def rotate(self, a, x = None, y = None):
+		if x == None and y == None:
+			self.trans.append("rotate(%s)" % a)
+		else:
+			self.trans.append("rotate(%s, %s, %s)" % (a, x, y))
+		return self
+
+	def scale(self, x, y = None):
+		if y == None:
+			y = x
+		self.trans.append("scale(%s, %s)" % (x, y))
+		return self
+
+	def xscale(self, x):
+		self.trans.append("scale(%s, 1)" % x)
+		return self
+
+	def yscale(self, y):
+		self.trans.append("scale(1, %s)" % y)
+		return self
+
+	def xskew(self, a):
+		self.trans.append("skewX(%s)" % a)
+		return self
+
+	def yskew(self, a):
+		self.trans.append("skewY(%s)" % a)
+		return self
+
+	def matrix(self, a, b, c, d, e, f):
+		self.trans.append("matrix(%s, %s, %s, %s, %s, %s)" % (a, b, c, d, e, f))
+		return self
 
 
 

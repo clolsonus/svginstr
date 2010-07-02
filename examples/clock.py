@@ -21,7 +21,7 @@ try:
 		a.tick(30 * hour, 65, 81, 3)
 		if hour != 0:
 			a.tick(30 * hour, 84, 96.5, 2)
-			a.push('rotate(%s)' % R(30 * hour))
+			a.rotate(R(30 * hour)).push()
 			sec = hour * 5
 			if sec >= 10:
 				if sec < 20:
@@ -40,7 +40,7 @@ try:
 	a.write('<path d="M0,-85 l-5,-10 l10,0 z" fill="white"/>')
 
 	# hour numbers
-	a.push('scale(1.5 1)')
+	a.scale(1.5, 1).push()
 	fontsize = 26
 	a.at(37, 10).text("3", fontsize, dic = {'font-weight': 'bold'})
 	a.at(-35, 10).text("9", fontsize, dic = {'font-weight': 'bold'})
@@ -52,7 +52,7 @@ try:
 	a.at(0, -21).text("CLOCK", fontsize)
 
 	# subclock
-	a.push("translate(0 38)")
+	a.translate(0, 38).push()
 	a.circle(2, 1.5)
 	a.circle(21, 1.5)
 	for i in position(0, 360, 15):
