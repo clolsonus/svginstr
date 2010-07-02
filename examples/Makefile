@@ -1,5 +1,6 @@
 export PYTHONPATH=../lib:$$PYTHONPATH
 
+FONTDIR=$(shell cd ../fonts && pwd)
 PYFILES=$(wildcard *.py)
 SVGFILES=$(PYFILES:.py=.svg)
 PNGFILES=$(PYFILES:.py=.png)
@@ -8,7 +9,12 @@ all: svg
 
 svg: $(SVGFILES)
 
-png: $(PNGFILES)
+png:
+	mkfontdir $(FONTDIR)
+	xset +fp $(FONTDIR)
+	xset fp rehash
+	$(MAKE) $(PNGFILES)
+	xset -fp $(FONTDIR)
 
 %.png: %.svg
 	../bin/svg2png $<
