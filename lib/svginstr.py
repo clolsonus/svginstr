@@ -187,7 +187,7 @@ class SVG:
 
 	def push(self):
 		self.stack.append(_group(self, string.join(self.trans)))
-		self.trans = []
+		self.reset()
 
 	def pop(self):
 		self.stack.pop()
@@ -419,6 +419,32 @@ class Instrument(SVG):
 		self.write('</g>')
 
 	def screw(self, scale, rot = None):
+		if rot == None:
+			rot = random() * 180
+
+		hole = RadialGradient()
+		hole.stop("0%", 0, alpha = 1)
+		hole.stop("30%", 0, alpha = 1)
+		hole.stop("65%", 0, alpha = 0)
+
+		head = RadialGradient("50%", "50%", "70%", "0%", "0%")
+		head.stop("0%", 60)
+		head.stop("90%", 25)
+		head.stop("100%", 10)
+
+		self.translate(self.x, self.y).push()
+		self.scale(scale).push()
+		self.gradient(hole).disc(100)
+		self.gradient(head).disc(50)
+
+		self.rotate(rot).push()
+		self.rectangle(100, 19, color = "#1a1a1a")
+		self.pop()
+
+		self.pop()
+		self.pop()
+
+	def screw2(self, scale, rot = None):
 		g = RadialGradient("50%", "50%", "50%", "50%", "50%")
 		g.stop("0%", 36)
 		g.stop("45%",36)
@@ -428,9 +454,7 @@ class Instrument(SVG):
 
 		if rot == None:
 			rot = random() * 180
-		x, y = self.x, self.y
-		self.at_origin()
-		self.translate(x, y).push()
+		self.translate(self.x, self.y).push()
 		self.rotate(rot).scale(scale).push()
 		self.gradient(g).disc(100)
 		self.rectangle(100, 16, color = "#181818")
