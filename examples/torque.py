@@ -49,6 +49,12 @@ try:
 			a.disc(8, 'black')
 
 			a.disc(0.4, 'red')
+
+			bezelshadow = RadialGradient()
+			bezelshadow.stop("0%", 0, alpha = 0)
+			bezelshadow.stop("70%", 0, alpha = 0)
+			bezelshadow.stop("100%", 0, alpha = 0.3)
+			a.gradient(bezelshadow).disc(110)
 			a.pop()
 		a.pop()
 
