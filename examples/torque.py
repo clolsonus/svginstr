@@ -53,6 +53,20 @@ try:
 	a.pop()
 
 
+	#-----
+	g = RadialGradient("50%", "50%", "80%", "0%", "0%")
+	g.stop("0%", 50)
+	g.stop("90%", 10)
+	g.stop("100%", 5)
+
+	if 0:
+		a.translate(85, 10).push()    # separate
+	else:
+		a.translate(-14, -14).push()  # centered
+	a.gradient(g).disc(10)
+	a.pop()
+
+
 	xml = a.xml("torque")
 	xml.animation("Lneedle", "sim/model/bo105/torque-pct", [0, 60, 120])
 	xml.animation("Rneedle", "sim/model/bo105/torque-pct", [0, 60, 120])
