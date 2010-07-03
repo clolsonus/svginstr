@@ -14,7 +14,7 @@ __doc__ = """
 try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
-	if a.scale(0.85).translate(-17, -17).push():
+	if a.region(-100, -100, 170, 170).push():
 		a.square(200, '#202020')
 		#a.disc(100, '#202020')
 
@@ -44,8 +44,8 @@ try:
 			a.at(0, 55).text("%", 17)
 			a.at(0, 75).text("TORQUE", 20)
 
-			a.at(0, -30).screw(0.1, 30)
-			a.at(0, 30).screw(0.1, 70)
+			a.at(0, -30).screw(0.12, 30)
+			a.at(0, 30).screw(0.12, 70)
 			a.disc(8, 'black')
 
 			a.disc(0.4, 'red')

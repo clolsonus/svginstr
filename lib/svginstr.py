@@ -181,12 +181,12 @@ class SVG:
 				p[k] = v
 		return p
 
-	def group(self, trans):
+	def group(self, trans, name = None):
 		" return a group class that has access to self "
-		return _group(self, trans)
+		return _group(self, trans, name)
 
-	def push(self):
-		self.stack.append(_group(self, string.join(self.trans)))
+	def push(self, name = None):
+		self.stack.append(_group(self, string.join(self.trans), name))
 		self.reset()
 		return True
 
@@ -355,19 +355,24 @@ class SVG:
 		self.trans.append("matrix(%s, %s, %s, %s, %s, %s)" % (a, b, c, d, e, f))
 		return self
 
+	def region(self, x, y, w, h, clip = 1):
+		return self.translate(x + w * 0.5, y + h * 0.5).scale(max(w, h) / 200.0)
+
 
 
 class _group:
 	" 'subclass' of SVG that has access to SVG methods "
-	def __init__(self, parent, trans = None):
+	def __init__(self, parent, trans = None, name = None):
 		if not isinstance(parent, SVG):
 			self.svg = None
 			raise ValueError("_group is only available as method of SVG")
 		self.svg = parent
+		attr = ""
+		if name:
+			attr += ' id="%s"' % name
 		if trans:
-			self.svg.write('<g transform="%s">' % trans)
-		else:
-			self.svg.write('<g>')
+			attr += ' transform="%s"' % trans
+		self.svg.write('<g%s>' % attr)
 
 	def __del__(self):
 		if self.svg:
