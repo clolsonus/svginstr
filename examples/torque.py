@@ -15,8 +15,8 @@ try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
 	a.scale(0.85).translate(-17, -17).push()
-	a.square(200, '#181818')
-	#a.disc(100, '#181818')
+	a.square(200, '#202020')
+	#a.disc(100, '#202020')
 
 	a.scale(0.92).push()
 	a.angle = lambda x: 230.0 * (x - 60) / 120 - 90
@@ -53,10 +53,10 @@ try:
 	a.pop()
 
 
-	#-----
+	#-- needle --
 	g = RadialGradient("50%", "50%", "80%", "0%", "0%")
-	g.stop("0%", 50)
-	g.stop("90%", 10)
+	g.stop("0%", 60)
+	g.stop("90%", 20)
 	g.stop("100%", 5)
 
 	if 0:

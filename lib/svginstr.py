@@ -420,11 +420,11 @@ class Instrument(SVG):
 
 	def screw(self, scale, rot = None):
 		g = RadialGradient("50%", "50%", "50%", "50%", "50%")
-		g.stop("0%", 24)
-		g.stop("45%",24)
-		g.stop("50%", 30)
-		g.stop("50%", 10, alpha = 1)
-		g.stop("77%", 30, alpha = 0)
+		g.stop("0%", 36)
+		g.stop("45%",36)
+		g.stop("50%", 40)
+		g.stop("50%", 20, alpha = 1)
+		g.stop("77%", 40, alpha = 0)
 
 		if rot == None:
 			rot = random() * 180
@@ -433,7 +433,7 @@ class Instrument(SVG):
 		self.translate(x, y).push()
 		self.rotate(rot).scale(scale).push()
 		self.gradient(g).disc(100)
-		self.rectangle(100, 16, color = "#141414")
+		self.rectangle(100, 16, color = "#181818")
 		self.pop()
 		self.pop()
 
