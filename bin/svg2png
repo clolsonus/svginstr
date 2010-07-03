@@ -1,7 +1,31 @@
 #!/bin/bash
-infile=${1?Usage: $0 <infile> [<outfile>]}
+
+while getopts "d:w:h:" arg; do
+	case "$arg" in
+	d)
+		options="$options -d $OPTARG "
+		;;
+	w)
+		options="$options -w $OPTARG "
+		;;
+	h)
+		options="$options -h $OPTARG "
+		;;
+	\?)
+		echo "getoprs error: $arg"
+		exit -1
+		;;
+	*)
+		echo "unknown argument: $arg"
+		exit -1
+	esac
+done
+shift $((OPTIND - 1))
+
+infile=${1?Usage: $0 [-d <dpi>] [-w <width>] [-h <height>] <infile> [<outfile>]}
 infile=${infile%.svg}
 outfile=${2:-$infile.png}
 infile+=.svg
 
-inkscape -e "$outfile" "$infile"
+
+inkscape $options -e "$outfile" "$infile"
