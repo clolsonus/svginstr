@@ -40,29 +40,29 @@ try:
 	a.write('<path d="M0,-85 l-5,-10 l10,0 z" fill="white"/>')
 
 	# hour numbers
-	a.scale(1.5, 1).push()
-	fontsize = 26
-	a.at(37, 10).text("3", fontsize, dic = {'font-weight': 'bold'})
-	a.at(-35, 10).text("9", fontsize, dic = {'font-weight': 'bold'})
-	a.at(1, -45).text("I2", fontsize, dic = {'font-weight': 'bold'})
-	a.pop()
+	if a.scale(1.5, 1).push():
+		fontsize = 26
+		a.at(37, 10).text("3", fontsize, dic = {'font-weight': 'bold'})
+		a.at(-35, 10).text("9", fontsize, dic = {'font-weight': 'bold'})
+		a.at(1, -45).text("I2", fontsize, dic = {'font-weight': 'bold'})
+		a.pop()
 
 	fontsize = 7
 	a.at(0, -29).text("FLIGHTGEAR", fontsize)
 	a.at(0, -21).text("CLOCK", fontsize)
 
 	# subclock
-	a.translate(0, 38).push()
-	a.circle(2, 1.5)
-	a.circle(21, 1.5)
-	for i in position(0, 360, 15):
-		a.tick(i, 21, 26, 2)
+	if a.translate(0, 38).push():
+		a.circle(2, 1.5)
+		a.circle(21, 1.5)
+		for i in position(0, 360, 15):
+			a.tick(i, 21, 26, 2)
 
-	fontsize = 11
-	a.at(1, -11).text("0", fontsize)
-	a.at(13, 12).text("5", fontsize)
-	a.at(-11, 12).text("I0", fontsize)
-	a.pop()
+		fontsize = 11
+		a.at(1, -11).text("0", fontsize)
+		a.at(13, 12).text("5", fontsize)
+		a.at(-11, 12).text("I0", fontsize)
+		a.pop()
 
 except Error, e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e

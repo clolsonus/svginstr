@@ -188,6 +188,7 @@ class SVG:
 	def push(self):
 		self.stack.append(_group(self, string.join(self.trans)))
 		self.reset()
+		return True
 
 	def pop(self):
 		self.stack.pop()
