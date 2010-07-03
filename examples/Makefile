@@ -15,7 +15,7 @@ png:
 	$(MAKE) $(PNGFILES)
 
 %.png: %.svg
-	../bin/svg2png -d 360 $< && mogrify -scale 25% $@
+	../bin/svg2png -d 360 $< && mogrify -resize 25% $@
 
 %.svg: %.py
 	./$<
