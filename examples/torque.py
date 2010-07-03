@@ -15,8 +15,8 @@ try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
 	if a.region(-100, -100, 170, 170).push():
-		a.square(200, '#202020')
-		#a.disc(100, '#202020')
+		#a.square(200, '#202020')
+		a.disc(100, '#202020')
 
 		if a.scale(0.92).push():
 			a.angle = lambda x: 230.0 * (x - 60) / 120 - 90
