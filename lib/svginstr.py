@@ -18,9 +18,42 @@ class Error(Exception):
 
 
 
-class Global:
-	transform = []
-	style = []
+class Matrix:
+	def __init__(self, a = 1, b = 0, c = 0, d = 1, e = 0, f = 0):
+		self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
+
+	def __str__(self):
+		return "[Matrix %f %f %f %f %f %f]" % (self.a, self.b, self.c, self.d, self.e, self.f)
+
+	def multiply(self, mat):
+		a = mat.a * self.a + mat.c * self.b
+		b = mat.b * self.a + mat.d * self.b
+		c = mat.a * self.c + mat.c * self.d
+		d = mat.b * self.c + mat.d * self.d
+		e = mat.a * self.e + mat.c * self.f + mat.e
+		f = mat.b * self.e + mat.d * self.f + mat.f
+		self.a = a; self.b = b; self.c = c; self.d = d; self.e = e; self.f = f
+
+	def transform(self, u, v):
+		return u * self.a + v * self.c + self.e, u * self.b + v * self.d + self.f
+
+	def translate(self, dx, dy):
+		self.multiply(Matrix(1, 0, 0, 1, dx, dy))
+
+	def scale(self, sx, sy):
+		self.multiply(Matrix(sx, 0, 0, sy, 0, 0))
+
+	def rotate(self, a):
+		a *= math.pi / 180
+		self.multiply(Matrix(math.cos(a), math.sin(a), -math.sin(a), math.cos(a), 0, 0))
+
+	def skewX(self, a):
+		a *= math.pi / 180
+		self.multiply(Matrix(1, 0, math.tan(a), 1, 0, 0))
+
+	def skewY(self, a):
+		a *= math.pi / 180
+		self.multiply(Matrix(1, math.tan(a), 0, 1, 0, 0))
 
 
 
@@ -81,6 +114,13 @@ class RadialGradient(Gradient):
 		return ["<radialGradient id=\"%s\" cx=\"%s\" cy=\"%s\" r=\"%s\" fx=\"%s\" fy=\"%s\">" \
 				% (self.name, self.cx, self.cy, self.r, self.fx, self.fy)] \
 				+ Gradient.code(self) + ["</radialGradient>"]
+
+
+
+class Global:
+	transform = []
+	style = []
+	matrix = None
 
 
 
@@ -367,6 +407,7 @@ class SVG:
 class Instrument(SVG):
 	def __init__(self, filename, w, h = None, desc = None):
 		h = h or w
+		Global.matrix = Matrix() # FIXME
 		SVG.__init__(self, filename, 'width="%spx" height="%spx" viewBox="%s %s %s %s"' % \
 				(R(w), R(h), 0, 0, 200, 200))
 		if desc:
