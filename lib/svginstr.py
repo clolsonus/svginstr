@@ -456,7 +456,7 @@ class Instrument(SVG):
 		hole = RadialGradient()
 		hole.stop("0%", 0, alpha = 1)
 		hole.stop("30%", 0, alpha = 1)
-		hole.stop("65%", 0, alpha = 0)
+		hole.stop("61%", 0, alpha = 0)
 
 		head = RadialGradient("50%", "50%", "70%", "0%", "0%")
 		head.stop("0%", 60)
