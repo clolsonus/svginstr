@@ -49,14 +49,14 @@ try:
 			a.disc(8, 'black')
 
 			a.disc(0.4, 'red')
-			a.pop()
+		a.pop()
 
 		bezelshadow = RadialGradient()
 		bezelshadow.stop("0%", 0, alpha = 0)
 		bezelshadow.stop("85%", 0, alpha = 0)
 		bezelshadow.stop("100%", 0, alpha = 0.4)
 		a.gradient(bezelshadow).square(200)
-		a.pop()
+	a.pop()
 
 
 	#-- needle --
@@ -69,9 +69,9 @@ try:
 		if 0:
 			a.translate(85, 10).push()    # separate
 		else:
-			a.translate(-14, -14).push()  # centered
+			a.translate(-15, -15).push()  # centered
 		a.gradient(g).disc(10)
-		a.pop()
+	a.pop()
 
 
 	xml = a.xml("torque")

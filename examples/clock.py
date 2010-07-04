@@ -21,14 +21,14 @@ try:
 		a.tick(30 * hour, 65, 81, 3)
 		if hour != 0:
 			a.tick(30 * hour, 84, 96.5, 2)
-			a.rotate(R(30 * hour)).push()
-			sec = hour * 5
-			if sec >= 10:
-				if sec < 20:
-					a.at(-3, -89).text("I", 10, dic = {"font-weight": "bold"})
-				else:
-					a.at(-4, -89).text(sec / 10, 10, dic = {"font-weight": "bold"})
-			a.at(5.5, -89).text(sec % 10, 10, dic = {"font-weight": "bold"})
+			if a.rotate(R(30 * hour)).push():
+				sec = hour * 5
+				if sec >= 10:
+					if sec < 20:
+						a.at(-3, -89).text("I", 10, dic = {"font-weight": "bold"})
+					else:
+						a.at(-4, -89).text(sec / 10, 10, dic = {"font-weight": "bold"})
+				a.at(5.5, -89).text(sec % 10, 10, dic = {"font-weight": "bold"})
 			a.pop()
 
 		for min in range(4):
@@ -45,7 +45,7 @@ try:
 		a.at(37, 10).text("3", fontsize, dic = {'font-weight': 'bold'})
 		a.at(-35, 10).text("9", fontsize, dic = {'font-weight': 'bold'})
 		a.at(1, -45).text("I2", fontsize, dic = {'font-weight': 'bold'})
-		a.pop()
+	a.pop()
 
 	fontsize = 7
 	a.at(0, -29).text("FLIGHTGEAR", fontsize)
@@ -62,7 +62,7 @@ try:
 		a.at(1, -11).text("0", fontsize)
 		a.at(13, 12).text("5", fontsize)
 		a.at(-11, 12).text("I0", fontsize)
-		a.pop()
+	a.pop()
 
 except Error, e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e

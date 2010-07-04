@@ -40,7 +40,7 @@ try:
 
 	if a.rotate(0).push():
 		a.write('<path d="M0,-94 A94,94 0 0,1 94,0" fill="none" stroke-width="4.5" stroke="yellow" opacity="0.8"/>')
-		a.pop()
+	a.pop()
 
 	a.arc(2, 8, 80, width = 10, color = "pink", opacity = 0.6)
 

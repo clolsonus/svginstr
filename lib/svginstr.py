@@ -360,26 +360,6 @@ class SVG:
 
 
 
-class _group:
-	" 'subclass' of SVG that has access to SVG methods "
-	def __init__(self, parent, trans = None, name = None):
-		if not isinstance(parent, SVG):
-			self.svg = None
-			raise ValueError("_group is only available as method of SVG")
-		self.svg = parent
-		attr = ""
-		if name:
-			attr += ' id="%s"' % name
-		if trans:
-			attr += ' transform="%s"' % trans
-		self.svg.write('<g%s>' % attr)
-
-	def __del__(self):
-		if self.svg:
-			self.svg.write('</g>')
-
-
-
 class Instrument(SVG):
 	def __init__(self, filename, w, h = None, desc = None):
 		h = h or w
@@ -438,16 +418,14 @@ class Instrument(SVG):
 		head.stop("90%", 25)
 		head.stop("100%", 10)
 
-		self.translate(self.x, self.y).push()
-		self.scale(scale).push()
-		self.gradient(hole).disc(100)
-		self.gradient(head).disc(50)
-
-		self.rotate(rot).push()
-		self.rectangle(100, 19, color = "#1a1a1a")
-		self.pop()
-
-		self.pop()
+		if self.translate(self.x, self.y).push():
+			if self.scale(scale).push():
+				self.gradient(hole).disc(100)
+				self.gradient(head).disc(50)
+				if self.rotate(rot).push():
+					self.rectangle(100, 19, color = "#1a1a1a")
+				self.pop()
+			self.pop()
 		self.pop()
 
 	def screw2(self, scale, rot = None):
@@ -460,11 +438,11 @@ class Instrument(SVG):
 
 		if rot == None:
 			rot = random() * 180
-		self.translate(self.x, self.y).push()
-		self.rotate(rot).scale(scale).push()
-		self.gradient(g).disc(100)
-		self.rectangle(100, 16, color = "#181818")
-		self.pop()
+		if self.translate(self.x, self.y).push():
+			if self.rotate(rot).scale(scale).push():
+				self.gradient(g).disc(100)
+				self.rectangle(100, 16, color = "#181818")
+			self.pop()
 		self.pop()
 
 	def xml(self, name):
