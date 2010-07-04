@@ -14,11 +14,11 @@ __doc__ = """
 try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
-	if a.region(-100, -100, 170, 170).push():
+	if a.region(-100, -100, 170, 170).begin():
 		#a.square(200, '#202020')
 		a.disc(100, '#202020')
 
-		if a.scale(0.92).push():
+		if a.scale(0.92).begin():
 			a.angle = lambda x: 230.0 * (x - 60) / 120 - 90
 
 			for i in range(0, 120, 2):
@@ -49,14 +49,14 @@ try:
 			a.disc(8, 'black')
 
 			a.disc(0.4, 'red')
-		a.pop()
+		a.end()
 
 		bezelshadow = RadialGradient()
 		bezelshadow.stop("0%", 0, alpha = 0)
 		bezelshadow.stop("85%", 0, alpha = 0)
 		bezelshadow.stop("100%", 0, alpha = 0.4)
 		a.gradient(bezelshadow).square(200)
-	a.pop()
+	a.end()
 
 
 	#-- needle --
@@ -67,11 +67,11 @@ try:
 
 	if True:
 		if 0:
-			a.translate(85, 10).push()    # separate
+			a.translate(85, 10).begin()    # separate
 		else:
-			a.translate(-15, -15).push()  # centered
+			a.translate(-15, -15).begin()  # centered
 		a.gradient(g).disc(10)
-	a.pop()
+	a.end()
 
 
 	xml = a.xml("torque")

@@ -221,7 +221,7 @@ class SVG:
 				p[k] = v
 		return p
 
-	def push(self, name = None):
+	def begin(self, name = None):
 		attr = ""
 		trans = string.join(self.trans)
 		if name:
@@ -233,7 +233,7 @@ class SVG:
 		self.reset()
 		return True
 
-	def pop(self):
+	def end(self):
 		self.write('</g>')
 
 	def angle(self, alpha):
@@ -291,12 +291,12 @@ class SVG:
 		self.rotate(R(b))
 		if self.x != 0 or self.y != 0:
 			self.translate(self.x, self.y)
-		self.push()
+		self.begin()
 		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
 				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
 				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
 				p['stroke-width'], p['color'], p['opacity'], attrib))
-		self.pop()
+		self.end()
 
 	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
 		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
@@ -304,10 +304,10 @@ class SVG:
 		if self.x != 0 or self.y != 0:
 			self.translate(self.x, self.y)
 		self.rotate(R(self.angle(alpha)))
-		self.push()
+		self.begin()
 		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
 				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], attrib))
-		self.pop()
+		self.end()
 
 
 	# positioning methods
@@ -463,15 +463,15 @@ class Instrument(SVG):
 		head.stop("90%", 25)
 		head.stop("100%", 10)
 
-		if self.translate(self.x, self.y).push():
-			if self.scale(scale).push():
+		if self.translate(self.x, self.y).begin():
+			if self.scale(scale).begin():
 				self.gradient(hole).disc(100)
 				self.gradient(head).disc(50)
-				if self.rotate(rot).push():
+				if self.rotate(rot).begin():
 					self.rectangle(100, 19, color = "#1a1a1a")
-				self.pop()
-			self.pop()
-		self.pop()
+				self.end()
+			self.end()
+		self.end()
 
 	def screw2(self, scale, rot = None):
 		g = RadialGradient("50%", "50%", "50%", "50%", "50%")
@@ -483,12 +483,12 @@ class Instrument(SVG):
 
 		if rot == None:
 			rot = random() * 180
-		if self.translate(self.x, self.y).push():
-			if self.rotate(rot).scale(scale).push():
+		if self.translate(self.x, self.y).begin():
+			if self.rotate(rot).scale(scale).begin():
 				self.gradient(g).disc(100)
 				self.rectangle(100, 16, color = "#181818")
-			self.pop()
-		self.pop()
+			self.end()
+		self.end()
 
 	def xml(self, name):
 		return _xml(self, name)
