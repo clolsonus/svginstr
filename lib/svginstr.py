@@ -181,17 +181,20 @@ class SVG:
 				p[k] = v
 		return p
 
-	def group(self, trans, name = None):
-		" return a group class that has access to self "
-		return _group(self, trans, name)
-
 	def push(self, name = None):
-		self.stack.append(_group(self, string.join(self.trans), name))
+		attr = ""
+		trans = string.join(self.trans)
+		if name:
+			attr += ' id="%s"' % name
+		if trans:
+			attr += ' transform="%s"' % trans
+
+		self.write('<g%s>' % attr)
 		self.reset()
 		return True
 
 	def pop(self):
-		self.stack.pop()
+		self.write('</g>')
 
 	def angle(self, alpha):
 		return alpha - 90
@@ -241,29 +244,30 @@ class SVG:
 		end = self.angle(end)
 		b = min(begin, end)
 		e = max(begin, end) - b
-		if self.x == 0 and self.y == 0: # FIXME
-			trans = ""
-		else:
-			trans = "translate(%s %s) " % (self.x, self.y)
 		if radius == 0:
-			radius = 0.00000000001;
-		_ = self.group("%srotate(%s)" % (trans, R(b)))
+			radius = 0.00000000001
+
+		attrib = "" # FIXME self._attrib()
+		self.rotate(R(b))
+		if self.x != 0 or self.y != 0:
+			self.translate(self.x, self.y)
+		self.push()
 		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
 				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
 				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
-				p['stroke-width'], p['color'], p['opacity'], self._attrib()))
-		self.reset()
+				p['stroke-width'], p['color'], p['opacity'], attrib))
+		self.pop()
 
 	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
 		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
-		if self.x == 0 and self.y == 0: # FIXME
-			trans = ""
-		else:
-			trans = "translate(%s %s) " % (self.x, self.y)
-		_ = self.group("%srotate(%s)" % (trans, R(self.angle(alpha))))
+		attrib = "" # FIXME self._attrib()
+		if self.x != 0 or self.y != 0:
+			self.translate(self.x, self.y)
+		self.rotate(R(self.angle(alpha)))
+		self.push()
 		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
-				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], self._attrib()))
-		self.reset()
+				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], attrib))
+		self.pop()
 
 
 	# positioning methods
