@@ -471,23 +471,6 @@ class Instrument(SVG):
 			self.end()
 		self.end()
 
-	def screw2(self, scale, rot = None):
-		g = RadialGradient("50%", "50%", "50%", "50%", "50%")
-		g.stop("0%", 36)
-		g.stop("45%",36)
-		g.stop("50%", 40)
-		g.stop("50%", 20, alpha = 1)
-		g.stop("77%", 40, alpha = 0)
-
-		if rot == None:
-			rot = random() * 180
-		if self.translate(self.x, self.y).begin():
-			if self.rotate(rot).scale(scale).begin():
-				self.gradient(g).disc(100)
-				self.rectangle(100, 16, color = "#181818")
-			self.end()
-		self.end()
-
 	def xml(self, name):
 		return _xml(self, name)
 
