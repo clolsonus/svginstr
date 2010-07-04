@@ -442,10 +442,8 @@ class Instrument(SVG):
 		self.write('<defs>')
 		self.write('<path id="foo" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
 		self.write('</defs>')
-		self.write('<text fill="%s" font-family="%s" font-size="%s">' \
-				% (color, font, R(size)))
+		self.write('<text fill="%s" font-family="%s" font-size="%s">' % (color, font, R(size)))
 		self.write('<textPath xlink:href="#foo">%s</textPath>' % text)
-		self.indent -= 1
 		self.write('</text>')
 		self.write('</g>')
 
