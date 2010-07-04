@@ -1,7 +1,7 @@
 export PYTHONPATH=$(CURDIR)/../lib:$$PYTHONPATH
 export FONTCONFIG_PATH=$(CURDIR)/../fonts:$$FONTCONFIG_PATH
 
-FONTDIR=$(shell cd ../fonts && pwd)
+FONTDIR=$(shell cd $(CURDIR)/../fonts && pwd)
 PYFILES=$(wildcard *.py)
 SVGFILES=$(PYFILES:.py=.svg)
 PNGFILES=$(PYFILES:.py=.png)
