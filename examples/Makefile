@@ -1,5 +1,5 @@
-export PYTHONPATH=$(PWD)/../lib:$$PYTHONPATH
-export FONTCONFIG_PATH=$(PWD)/../fonts:$$FONTCONFIG_PATH
+export PYTHONPATH=$(CURDIR)/../lib:$$PYTHONPATH
+export FONTCONFIG_PATH=$(CURDIR)/../fonts:$$FONTCONFIG_PATH
 
 FONTDIR=$(shell cd ../fonts && pwd)
 PYFILES=$(wildcard *.py)
