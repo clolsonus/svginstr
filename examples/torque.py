@@ -27,7 +27,7 @@ try:
 			a.arc(0, 80, 94.5, width = 10, color = "#00c000")
 
 			for i in range(0, 121, 10):
-				a.tick(i, 81, 99.5, 3)
+				a.tick(i, 82, 99.5, 3)
 
 			a.tick(80, 81, 99.5, 3, color = "#ffc000")
 			a.tick(110, 70, 99.5, 3.3, color = "red")
@@ -46,8 +46,8 @@ try:
 
 			a.at(0, -30).screw(0.12, 30)
 			a.at(0, 30).screw(0.12, 70)
-			a.disc(8, 'black')
 
+			a.disc(8, 'black')
 			a.disc(0.4, 'red')
 		a.end()
 

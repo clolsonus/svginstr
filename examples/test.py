@@ -16,7 +16,7 @@ try:
 	a.disc(98, color = 'black')
 	a.disc(1)
 
-	" define mapping function: map scale value 0-10 to angle 0-190 degree "
+	# define mapping function: map scale value 0-10 to angle 0-190 degree
 	a.angle = lambda x: x * 190.0 / 10.0 - 90
 
 	for i in range(0, 11):
