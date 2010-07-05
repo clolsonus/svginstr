@@ -25,6 +25,9 @@ class Matrix:
 	def __str__(self):
 		return "[Matrix %f %f %f %f %f %f]" % (self.a, self.b, self.c, self.d, self.e, self.f)
 
+	def copy(self):
+		return Matrix(self.a, self.b, self.c, self.d, self.e, self.f)
+
 	def multiply(self, mat):
 		a = mat.a * self.a + mat.c * self.b
 		b = mat.b * self.a + mat.d * self.b
@@ -32,28 +35,42 @@ class Matrix:
 		d = mat.b * self.c + mat.d * self.d
 		e = mat.a * self.e + mat.c * self.f + mat.e
 		f = mat.b * self.e + mat.d * self.f + mat.f
-		self.a = a; self.b = b; self.c = c; self.d = d; self.e = e; self.f = f
+		self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
+		return self
+
+	def invert(self):
+		idet = 1.0 / (self.a * self.d - self.b * self.c)
+		a = idet * self.d
+		b = idet * -self.b
+		c = idet * -self.c
+		d = idet * self.a
+		e = idet * (self.f * self.c - self.d * self.e)
+		f = idet * (self.b * self.e - self.f * self.a)
+		self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
+		return self
 
 	def transform(self, u, v):
 		return u * self.a + v * self.c + self.e, u * self.b + v * self.d + self.f
 
 	def translate(self, dx, dy):
-		self.multiply(Matrix(1, 0, 0, 1, dx, dy))
+		return self.multiply(Matrix(1, 0, 0, 1, dx, dy))
 
-	def scale(self, sx, sy):
-		self.multiply(Matrix(sx, 0, 0, sy, 0, 0))
+	def scale(self, sx, sy = None):
+		if sy == None:
+			sy = sx
+		return self.multiply(Matrix(sx, 0, 0, sy, 0, 0))
 
 	def rotate(self, a):
-		a *= math.pi / 180
-		self.multiply(Matrix(math.cos(a), math.sin(a), -math.sin(a), math.cos(a), 0, 0))
+		a *= pi / 180
+		return self.multiply(Matrix(cos(a), sin(a), -sin(a), cos(a), 0, 0))
 
 	def skewX(self, a):
-		a *= math.pi / 180
-		self.multiply(Matrix(1, 0, math.tan(a), 1, 0, 0))
+		a *= pi / 180
+		return self.multiply(Matrix(1, 0, tan(a), 1, 0, 0))
 
 	def skewY(self, a):
-		a *= math.pi / 180
-		self.multiply(Matrix(1, math.tan(a), 0, 1, 0, 0))
+		a *= pi / 180
+		return self.multiply(Matrix(1, tan(a), 0, 1, 0, 0))
 
 
 
