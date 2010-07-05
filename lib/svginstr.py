@@ -61,15 +61,15 @@ class Matrix:
 		return self.multiply(Matrix(sx, 0, 0, sy, 0, 0))
 
 	def rotate(self, a):
-		a *= pi / 180
+		a = float(a) * pi / 180.0
 		return self.multiply(Matrix(cos(a), sin(a), -sin(a), cos(a), 0, 0))
 
 	def skewX(self, a):
-		a *= pi / 180
+		a = float(a) * pi / 180.0
 		return self.multiply(Matrix(1, 0, tan(a), 1, 0, 0))
 
 	def skewY(self, a):
-		a *= pi / 180
+		a = float(a) * pi / 180.0
 		return self.multiply(Matrix(1, tan(a), 0, 1, 0, 0))
 
 
