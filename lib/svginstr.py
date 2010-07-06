@@ -142,7 +142,7 @@ class RadialGradient(Gradient):
 class Global:
 	transform = []
 	style = []
-	matrix = None
+	matrix = None  # for OpenGL UV
 
 
 
@@ -160,7 +160,8 @@ class SVG:
 		self.x = 0
 		self.y = 0
 		self.indent = 0
-		self.stack = []
+		self.matrices = [Global.matrix.copy()]
+		self.matrix = None
 		self.defs = []
 		self.trans = []
 		self.contents = []
@@ -253,11 +254,14 @@ class SVG:
 			attr += ' transform="%s"' % trans
 
 		self.write('<g%s>' % attr)
+
+		self.matrices.append(self.matrix.multiply(self.matrices[-1]))
 		self.reset()
 		return True
 
 	def end(self):
 		self.write('</g>')
+		self.matrices.pop()
 
 	def angle(self, alpha):
 		return alpha - 90
@@ -266,6 +270,7 @@ class SVG:
 		self.at_origin()
 		self.styles = []
 		self.trans = []
+		self.matrix = Matrix()
 
 	def _attrib(self):
 		return string.join([self._style(), self._trans()], " ")
@@ -386,51 +391,64 @@ class SVG:
 			return ""
 
 	def translate(self, x, y = None):
-		self.trans.append("translate(%s, %s)" % (x, y or 0))
+		if y == None:
+			y = 0
+		self.trans.append("translate(%s, %s)" % (x, y))
+		self.matrix = Matrix().translate(x, y).multiply(self.matrix)
 		return self
 
 	def rotate(self, a, x = None, y = None):
 		if x == None and y == None:
 			self.trans.append("rotate(%s)" % a)
+			self.matrices[-1] = Matrix().rotate(a).multiply(self.matrix)
 		else:
 			self.trans.append("rotate(%s, %s, %s)" % (a, x, y))
+			self.matrix = Matrix().translate(-x, -y).rotate(a).translate(x, y).multiply(self.matrix)
 		return self
 
 	def scale(self, x, y = None):
 		if y == None:
 			y = x
 		self.trans.append("scale(%s, %s)" % (x, y))
+		self.matrix = Matrix().scale(x, y).multiply(self.matrix)
 		return self
 
 	def xscale(self, x):
 		self.trans.append("scale(%s, 1)" % x)
+		self.matrix = Matrix().scale(x, 1).multiply(self.matrix)
 		return self
 
 	def yscale(self, y):
 		self.trans.append("scale(1, %s)" % y)
+		self.matrix = Matrix().scale(1, y).multiply(self.matrix)
 		return self
 
 	def xskew(self, a):
 		self.trans.append("skewX(%s)" % a)
+		self.matrix = Matrix().skewX(a).multiply(self.matrix)
 		return self
 
 	def yskew(self, a):
 		self.trans.append("skewY(%s)" % a)
+		self.matrix = Matrix().skewY(a).multiply(self.matrix)
 		return self
 
 	def matrix(self, a, b, c, d, e, f):
 		self.trans.append("matrix(%s, %s, %s, %s, %s, %s)" % (a, b, c, d, e, f))
+		self.matrix = Matrix().multiply(Matrix(a, b, c, d, e, f)).multiply(self.matrix)
 		return self
 
 	def region(self, x, y, w, h, clip = 1):
-		return self.translate(x + w * 0.5, y + h * 0.5).scale(max(w, h) / 200.0)
+		W = max(w, h)       # scale and translate applied in reverse order:
+		return self.translate(x + w * 0.5, y + h * 0.5).scale(W / 200.0)
 
 
 
 class Instrument(SVG):
 	def __init__(self, filename, w, h = None, desc = None):
 		h = h or w
-		Global.matrix = Matrix() # FIXME
+		# matrix that turns svginstr's coordinates into OpenGL UV coordinates
+		Global.matrix = Matrix().translate(-0.5, -0.5).scale(200, -200).invert()
 		SVG.__init__(self, filename, 'width="%spx" height="%spx" viewBox="%s %s %s %s"' % \
 				(R(w), R(h), 0, 0, 200, 200))
 		if desc:
