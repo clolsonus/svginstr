@@ -79,6 +79,71 @@ class Matrix:
 
 
 
+class Path:
+	def __init__(self, x = None, y = None):
+		self.path = ""
+		if x != None and y != None:
+			self.path += "M %s %s" % (x, y)
+		self.reset()
+
+	def __str__(self):
+		return self.path
+
+	def _assert_even(self, args):
+		if len(args) % 2:
+			raise Error("Path: incomplete argument list")
+
+	def reset(self):
+		self.absolute = False
+		return self
+
+	def abs(self):
+		self.absolute = True
+		return self
+
+	def rel(self):
+		self.absolute = False
+		return self
+
+	def polar(self, angle, radius):
+		self.path += " %s %s %s" % (['m', 'M'][self.absolute], radius * sind(angle), radius * cosd(angle))
+		return self.reset()
+
+	def moveto(self, x, y*args):
+		self._assert_even(args)
+		while args:
+			self.path += " %s %s %s" % (['m', 'M'][self.absolute], args[0], args[1])
+			args = args[2:]
+		return self.reset()
+
+	def lineto(self, *args):
+		self._assert_even(args)
+		while args:
+			self.path += " %s %s %s" % (['l', 'L'][self.absolute], args[0], args[1])
+			args = args[2:]
+		return self.reset()
+
+	def close(self):
+		self.path += " z"
+		return self.reset()
+
+	def right(self, dx):
+		self.path += " h %s" % dx
+		return self.reset()
+
+	def left(self, dx):
+		return self.right(-dx).reset()
+
+	def down(self, dy):
+		self.path += " v %s" % dy
+		return self.reset()
+
+	def up(self, dy):
+		return self.down(-dy).reset()
+
+
+
+
 class Gradient:
 	counter = 0
 
