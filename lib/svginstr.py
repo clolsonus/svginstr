@@ -1,6 +1,8 @@
 #!python
 
-import sys, gzip, string
+import sys
+import gzip
+import string
 from math import ceil, sin, cos, pi
 from random import random
 
@@ -243,9 +245,10 @@ class SVG:
 
 	def begin(self, name = None):
 		attr = ""
-		trans = string.join(self.trans)
 		if name:
 			attr += ' id="%s"' % name
+
+		trans = string.join(self.trans)
 		if trans:
 			attr += ' transform="%s"' % trans
 
