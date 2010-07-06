@@ -28,6 +28,9 @@ class Matrix:
 	def copy(self):
 		return Matrix(self.a, self.b, self.c, self.d, self.e, self.f)
 
+	def transform(self, u, v):
+		return u * self.a + v * self.c + self.e, u * self.b + v * self.d + self.f
+
 	def multiply(self, mat):
 		a = mat.a * self.a + mat.c * self.b
 		b = mat.b * self.a + mat.d * self.b
@@ -39,7 +42,10 @@ class Matrix:
 		return self
 
 	def invert(self):
-		idet = 1.0 / (self.a * self.d - self.b * self.c)
+		det = (self.a * self.d - self.b * self.c)
+		if det == 0.0:
+			raise ValueError("Matrix not invertible")
+		idet = 1.0 / det
 		a = idet * self.d
 		b = idet * -self.b
 		c = idet * -self.c
@@ -48,9 +54,6 @@ class Matrix:
 		f = idet * (self.b * self.e - self.f * self.a)
 		self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
 		return self
-
-	def transform(self, u, v):
-		return u * self.a + v * self.c + self.e, u * self.b + v * self.d + self.f
 
 	def translate(self, dx, dy):
 		return self.multiply(Matrix(1, 0, 0, 1, dx, dy))
