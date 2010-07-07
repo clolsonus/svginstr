@@ -105,15 +105,12 @@ class Path:
 		self.absolute = False
 		return self
 
-	def polar(self, angle, radius):
-		self.path += " %s %s %s" % (['m', 'M'][self.absolute], radius * sind(angle), radius * cosd(angle))
+	def moveto(self, x, y):
+		self.path += " %s %s %s" % (['m', 'M'][self.absolute], x, y)
 		return self.reset()
 
-	def moveto(self, x, y*args):
-		self._assert_even(args)
-		while args:
-			self.path += " %s %s %s" % (['m', 'M'][self.absolute], args[0], args[1])
-			args = args[2:]
+	def polar(self, angle, radius):
+		self.path += " %s %s %s" % (['m', 'M'][self.absolute], radius * sind(angle), radius * cosd(angle))
 		return self.reset()
 
 	def lineto(self, *args):
