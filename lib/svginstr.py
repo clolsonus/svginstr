@@ -311,9 +311,10 @@ class SVG:
 		if name:
 			attr += ' id="%s"' % name
 
-		trans = string.join(self.trans)
-		if trans:
-			attr += ' transform="%s"' % trans
+		if self.trans:
+			t = self.trans[:]
+			t.reverse()
+			attr += ' transform="%s"' % string.join(t)
 
 		self.write('<g%s>' % attr)
 
@@ -456,53 +457,53 @@ class SVG:
 		if y == None:
 			y = 0
 		self.trans.append("translate(%s, %s)" % (x, y))
-		self.matrix = Matrix().translate(x, y).multiply(self.matrix)
+		self.matrix.translate(x, y)
 		return self
 
 	def rotate(self, a, x = None, y = None):
 		if x == None and y == None:
 			self.trans.append("rotate(%s)" % a)
-			self.matrices[-1] = Matrix().rotate(a).multiply(self.matrix)
+			self.matrix.rotate(a)
 		else:
 			self.trans.append("rotate(%s, %s, %s)" % (a, x, y))
-			self.matrix = Matrix().translate(-x, -y).rotate(a).translate(x, y).multiply(self.matrix)
+			self.matrix.translate(-x, -y).rotate(a).translate(x, y)
 		return self
 
 	def scale(self, x, y = None):
 		if y == None:
 			y = x
 		self.trans.append("scale(%s, %s)" % (x, y))
-		self.matrix = Matrix().scale(x, y).multiply(self.matrix)
+		self.matrix.scale(x, y)
 		return self
 
 	def xscale(self, x):
 		self.trans.append("scale(%s, 1)" % x)
-		self.matrix = Matrix().scale(x, 1).multiply(self.matrix)
+		self.matrix.scale(x, 1)
 		return self
 
 	def yscale(self, y):
 		self.trans.append("scale(1, %s)" % y)
-		self.matrix = Matrix().scale(1, y).multiply(self.matrix)
+		self.matrix.scale(1, y)
 		return self
 
 	def xskew(self, a):
 		self.trans.append("skewX(%s)" % a)
-		self.matrix = Matrix().skewX(a).multiply(self.matrix)
+		self.matrix.skewX(a)
 		return self
 
 	def yskew(self, a):
 		self.trans.append("skewY(%s)" % a)
-		self.matrix = Matrix().skewY(a).multiply(self.matrix)
+		self.matrix.skewY(a)
 		return self
 
 	def matrix(self, a, b, c, d, e, f):
 		self.trans.append("matrix(%s, %s, %s, %s, %s, %s)" % (a, b, c, d, e, f))
-		self.matrix = Matrix().multiply(Matrix(a, b, c, d, e, f)).multiply(self.matrix)
+		self.matrix.multiply(Matrix(a, b, c, d, e, f))
 		return self
 
 	def region(self, x, y, w, h, clip = 1):
 		W = max(w, h)       # scale and translate applied in reverse order:
-		return self.translate(x + w * 0.5, y + h * 0.5).scale(W / 200.0)
+		return self.scale(W / 200.0).translate(x + w * 0.5, y + h * 0.5)
 
 
 
@@ -564,13 +565,11 @@ class Instrument(SVG):
 		head.stop("90%", 25)
 		head.stop("100%", 10)
 
-		if self.translate(self.x, self.y).begin():
-			if self.scale(scale).begin():
-				self.gradient(hole).disc(100)
-				self.gradient(head).disc(50)
-				if self.rotate(rot).begin():
-					self.rectangle(100, 19, color = "#1a1a1a")
-				self.end()
+		if self.scale(scale).translate(self.x, self.y).begin():
+			self.gradient(hole).disc(100)
+			self.gradient(head).disc(50)
+			if self.rotate(rot).begin():
+				self.rectangle(100, 19, color = "#1a1a1a")
 			self.end()
 		self.end()
 
