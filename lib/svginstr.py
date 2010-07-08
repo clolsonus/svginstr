@@ -3,7 +3,7 @@
 import sys
 import gzip
 import string
-from math import ceil, sin, cos, pi
+from math import ceil, sin, cos, pi, sqrt
 from random import random
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
@@ -251,6 +251,7 @@ class SVG:
 		self.trans = []
 		self.contents = []
 		self.reset()
+		self.unit = 0.01
 
 		try:
 			if filename.endswith(".svgz") or filename.endswith(".svg.gz"):
@@ -342,6 +343,10 @@ class SVG:
 		self.write('<g%s>' % attr)
 
 		self.matrices.append(self.matrix.multiply(self.matrices[-1]))
+
+		x, y = self.matrices[-1].copy().invert().transform(0, 1)
+		self.unit = 0.01 * sqrt(x * x + y * y)
+
 		self.reset()
 		return True
 
