@@ -81,6 +81,7 @@ class Matrix:
 
 class Path:
 	def __init__(self, x = None, y = None):
+		self.absolute = True
 		self.path = ""
 		if x != None and y != None:
 			self.path += "M %s %s" % (x, y)
@@ -89,13 +90,20 @@ class Path:
 	def __str__(self):
 		return self.path
 
-	def _assert_even(self, args):
-		if len(args) % 2:
+	def _assert_multi_args(self, args, num):
+		if len(args) % num:
 			raise Error("Path: incomplete argument list")
 
 	def reset(self):
-		self.absolute = False
-		return self
+		return self # NOOP ATM
+
+	def path(self, p):
+		self.path += str(path);
+		return self;
+
+	def raw(self, s):
+		self.path += s;
+		return self;
 
 	def abs(self):
 		self.absolute = True
@@ -109,15 +117,23 @@ class Path:
 		self.path += " %s %s %s" % (['m', 'M'][self.absolute], x, y)
 		return self.reset()
 
-	def polar(self, angle, radius):
+	def moveto_polar(self, angle, radius):
 		self.path += " %s %s %s" % (['m', 'M'][self.absolute], radius * sind(angle), radius * cosd(angle))
 		return self.reset()
 
 	def lineto(self, *args):
-		self._assert_even(args)
+		self._assert_multi_args(args, 2)
 		while args:
 			self.path += " %s %s %s" % (['l', 'L'][self.absolute], args[0], args[1])
 			args = args[2:]
+		return self.reset()
+
+	def lineto_polar(self, *args):
+		self._assert_multi_args(args, 2)
+		while args:
+			angle, radius, args = args[0], args[1], args[2:]
+			self.path += " %s %s %s" % (['l', 'L'][self.absolute], \
+					radius * sind(angle), radius * cosd(angle))
 		return self.reset()
 
 	def close(self):
@@ -138,6 +154,13 @@ class Path:
 	def up(self, dy):
 		return self.down(-dy).reset()
 
+	def arc(self, *args):
+		self._assert_multi_args(args, 7)
+		while args:
+			rx, ry, rot, large, sweep, x, y = args[0:7]
+			args = args[7:]
+			self.path += " %s %s, %s %s %s, %s %s, %s" % (['a', 'A'][self.absolute], rx, ry, rot, large, sweep, x, y)
+		return self
 
 
 

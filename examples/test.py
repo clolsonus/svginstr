@@ -49,6 +49,11 @@ try:
 	a.arc(0, 45, 70, width = 5, color = "orange", opacity = 1)
 
 
+	triangle = Path().abs().moveto_polar(0, 20).lineto_polar(120, 20, -120, 20).close()
+	a.scale(0.8).rotate(60).translate(-20, -50).begin()
+	a.write('<path d="%s" fill="white" stroke="maroon" stroke-width="5" opacity="1"/>' % str(triangle))
+	a.end()
+
 except Error, e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e
 
