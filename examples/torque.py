@@ -14,7 +14,7 @@ __doc__ = """
 try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
-	if a.region(-100, -100, 170, 170).begin():
+	if a.region(-100, -100, 175, 175).begin():
 		#a.square(200, '#202020')
 		a.disc(100, '#202020')
 
@@ -67,9 +67,18 @@ try:
 
 	if True:
 		if 0:
-			a.translate(85, 10).begin()    # separate
+			a.translate(88, -12).begin()    # separate (for final rendering)
 		else:
-			a.translate(-15, -15).begin()  # centered
+			a.rotate(-113).translate(-12.5, -12.5).begin()  # centered (for tests)
+
+		top = Path(-3, -40).rel().up(20).lineto(3, -6).lineto(3, 6).down(20).close()
+		a.write('<path d="%s" fill="white" stroke="#d0d0d0" stroke-width="0.6"/>' % str(top))
+
+		bot = Path(-3, -40).rel().down(60).arc(7, 7, 0, 1, 0, 6, 0).up(60).close()
+		a.write('<path d="%s" fill="#242424" stroke="#181818" stroke-width="0.6"/>' % str(bot))
+
+		#top.debug(a)
+		#bot.debug(a)
 		a.gradient(g).disc(10)
 	a.end()
 
