@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if ! which inkscape &>/dev/null; then
+	echo "$0 depends on inkscape, which doesn't seem to be installed"
+	exit 1
+fi
+
 while getopts "d:w:h:" arg; do
 	case "$arg" in
 	d)
