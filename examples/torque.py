@@ -71,10 +71,12 @@ try:
 		else:
 			a.rotate(-113).translate(-12.5, -12.5).begin()  # centered (for tests)
 
-		top = Path(-3, -40).rel().up(20).lineto(3, -6).lineto(3, 6).down(20).close()
-		a.write('<path d="%s" fill="white" stroke="#d0d0d0" stroke-width="0.6"/>' % str(top))
+		top = Path(-3, -30).rel().up(30).lineto(3, -19).lineto(3, 19).down(30).close()
+		a.write('<path d="%s" fill="#fff0c0" stroke="#000000" stroke-width="0.1"/>' % str(top))
 
-		bot = Path(-3, -40).rel().down(60).arc(7, 7, 0, 1, 0, 6, 0).up(60).close()
+		a.at(0.3, -50).text("1", color = "#101010")
+
+		bot = Path(-3, -30).rel().down(50).arc(7, 7, 0, 1, 0, 6, 0).up(50).close()
 		a.write('<path d="%s" fill="#242424" stroke="#181818" stroke-width="0.6"/>' % str(bot))
 
 		#top.debug(a)
