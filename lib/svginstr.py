@@ -328,7 +328,6 @@ class Instrument:
 
 			self.write('<g font-family="%(font-family)s" transform="translate(100, 100)">' % self.default)
 			self.write('<rect x="-100" y="-100" width="200" height="200" fill="none"/>')
-			#self.chequer()
 
 		except IOError as error:
 			raise Error("I/O error(%s): %s" % error)
@@ -353,7 +352,7 @@ class Instrument:
 			raise Error("I/O error(%s): %s" % error)
 
 	def _write(self, s = ""):
-		""" For internal purposes only. Don't use from outside! """
+		# For internal purposes only. Don't use from outside!
 		try:
 			s = s.strip()
 			if s.startswith('<?') or s.startswith('<!'):

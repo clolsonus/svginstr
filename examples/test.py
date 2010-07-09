@@ -38,7 +38,7 @@ try:
 
 	a.arctext(210, 80, "Better than MetaPost", size = 15, color = "lightblue", font = "Bitstream Vera Serif")
 
-	if a.rotate(0).begin():
+	if a.rotate(0).begin():  # example for writing raw svg
 		a.write('<path d="M0,-94 A94,94 0 0,1 94,0" fill="none" stroke-width="4.5" stroke="yellow" opacity="0.8"/>')
 	a.end()
 
