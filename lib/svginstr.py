@@ -373,6 +373,8 @@ class Instrument:
 		except IOError, (errno, strerror):
 			raise Error("I/O error(%s): %s" % (errno, strerror))
 
+
+	# general methods
 	def write(self, s = ""):
 		self.contents.append(s)
 
@@ -434,118 +436,6 @@ class Instrument:
 	def _attrib(self):
 		return string.join([self._style(), self._trans()], " ")
 
-	# drawing primitives
-	def circle(self, radius, width, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color})
-		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s" stroke="%s"%s/>' \
-				% (self.x, self.y, R(radius), R(width), p['color'], self._attrib()))
-		self.reset()
-
-	def disc(self, radius, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color})
-		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"%s/>' \
-				% (self.x, self.y, R(radius), p['color'], self._attrib()))
-		self.reset()
-
-	def rectangle(self, width, height, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color})
-		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"%s/>' % \
-				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), \
-				color, self._attrib()))
-		self.reset()
-
-	def square(self, width, color = None, dic = {}):
-		self.rectangle(width, width, color, dic)
-
-	def text(self, text, size = None, font = None, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color, 'font-family': font, '#font-size': size})
-		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
-				'text-anchor="middle"%s>%s</text>' \
-				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], \
-				self._attrib(), text))
-		self.reset()
-
-	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
-		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
-		begin = self.angle(begin)
-		end = self.angle(end)
-		b = min(begin, end)
-		e = max(begin, end) - b
-		if radius == 0:
-			radius = 0.00000000001
-
-		attrib = "" # FIXME self._attrib()
-		self.rotate(R(b))
-		if self.x != 0 or self.y != 0:
-			self.translate(self.x, self.y)
-		self.begin()
-		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
-				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
-				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
-				p['stroke-width'], p['color'], p['opacity'], attrib))
-		self.end()
-
-	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
-		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
-		attrib = "" # FIXME self._attrib()
-		if self.x != 0 or self.y != 0:
-			self.translate(self.x, self.y)
-		self.rotate(R(self.angle(alpha)))
-		self.begin()
-		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
-				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], attrib))
-		self.end()
-
-	def chequer(self, size = 10, color = "lightgrey"):
-		" fake transparency  ;-) "
-		for y in range(20):
-			for x in range(20):
-				if (x + y) & 1:
-					continue
-				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
-						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
-
-	def arctext(self, startangle, r, text, size = None, font = None, color = None):
-		if not font:
-			font = self.font
-		if not size:
-			size = self.size
-		if not color:
-			color = self.color
-		r = R(r)
-		self.write('<g transform="rotate(%s)">' % startangle)
-		self.write('<defs>')
-		self.write('<path id="arctext" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
-		self.write('</defs>')
-		self.write('<text fill="%s" font-family="%s" font-size="%s">' % (color, font, R(size)))
-		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
-		self.write('</text>')
-		self.write('</g>')
-
-	def screw(self, scale, rot = None):
-		if rot == None:
-			rot = random() * 180
-
-		hole = RadialGradient()
-		hole.stop("0%", 0, alpha = 1)
-		hole.stop("30%", 0, alpha = 1)
-		hole.stop("61%", 0, alpha = 0)
-
-		head = RadialGradient("50%", "50%", "70%", "0%", "0%")
-		head.stop("0%", 60)
-		head.stop("90%", 25)
-		head.stop("100%", 10)
-
-		if self.scale(scale).translate(self.x, self.y).begin():
-			self.gradient(hole).disc(100)
-			self.gradient(head).disc(50)
-			if self.rotate(rot).begin():
-				self.rectangle(100, 19, color = "#1a1a1a")
-			self.end()
-		self.end()
-
-	def xml(self, name):
-		return _xml(self, name)
 
 	# positioning methods
 	def at_origin(self):
@@ -661,6 +551,120 @@ class Instrument:
 	def region(self, x, y, w, h, clip = 1):
 		W = max(w, h)       # scale and translate applied in reverse order:
 		return self.scale(W / 200.0).translate(x + w * 0.5, y + h * 0.5)
+
+
+	# drawing primitives
+	def circle(self, radius, width, color = None, dic = {}):
+		p = self.getparams(dic, {'color': color})
+		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s" stroke="%s"%s/>' \
+				% (self.x, self.y, R(radius), R(width), p['color'], self._attrib()))
+		self.reset()
+
+	def disc(self, radius, color = None, dic = {}):
+		p = self.getparams(dic, {'color': color})
+		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"%s/>' \
+				% (self.x, self.y, R(radius), p['color'], self._attrib()))
+		self.reset()
+
+	def rectangle(self, width, height, color = None, dic = {}):
+		p = self.getparams(dic, {'color': color})
+		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"%s/>' % \
+				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), \
+				color, self._attrib()))
+		self.reset()
+
+	def square(self, width, color = None, dic = {}):
+		self.rectangle(width, width, color, dic)
+
+	def text(self, text, size = None, font = None, color = None, dic = {}):
+		p = self.getparams(dic, {'color': color, 'font-family': font, '#font-size': size})
+		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
+				'text-anchor="middle"%s>%s</text>' \
+				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], \
+				self._attrib(), text))
+		self.reset()
+
+	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
+		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
+		begin = self.angle(begin)
+		end = self.angle(end)
+		b = min(begin, end)
+		e = max(begin, end) - b
+		if radius == 0:
+			radius = 0.00000000001
+
+		attrib = "" # FIXME self._attrib()
+		self.rotate(R(b))
+		if self.x != 0 or self.y != 0:
+			self.translate(self.x, self.y)
+		self.begin()
+		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
+				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
+				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
+				p['stroke-width'], p['color'], p['opacity'], attrib))
+		self.end()
+
+	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
+		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
+		attrib = "" # FIXME self._attrib()
+		if self.x != 0 or self.y != 0:
+			self.translate(self.x, self.y)
+		self.rotate(R(self.angle(alpha)))
+		self.begin()
+		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
+				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], attrib))
+		self.end()
+
+	def chequer(self, size = 10, color = "lightgrey"):
+		" fake transparency  ;-) "
+		for y in range(20):
+			for x in range(20):
+				if (x + y) & 1:
+					continue
+				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
+						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
+
+	def arctext(self, startangle, r, text, size = None, font = None, color = None):
+		if not font:
+			font = self.font
+		if not size:
+			size = self.size
+		if not color:
+			color = self.color
+		r = R(r)
+		self.write('<g transform="rotate(%s)">' % startangle)
+		self.write('<defs>')
+		self.write('<path id="arctext" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
+		self.write('</defs>')
+		self.write('<text fill="%s" font-family="%s" font-size="%s">' % (color, font, R(size)))
+		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
+		self.write('</text>')
+		self.write('</g>')
+
+	def screw(self, scale, rot = None):
+		if rot == None:
+			rot = random() * 180
+
+		hole = RadialGradient()
+		hole.stop("0%", 0, alpha = 1)
+		hole.stop("30%", 0, alpha = 1)
+		hole.stop("61%", 0, alpha = 0)
+
+		head = RadialGradient("50%", "50%", "70%", "0%", "0%")
+		head.stop("0%", 60)
+		head.stop("90%", 25)
+		head.stop("100%", 10)
+
+		if self.scale(scale).translate(self.x, self.y).begin():
+			self.gradient(hole).disc(100)
+			self.gradient(head).disc(50)
+			if self.rotate(rot).begin():
+				self.rectangle(100, 19, color = "#1a1a1a")
+			self.end()
+		self.end()
+
+	def xml(self, name):
+		return _xml(self, name)
 
 
 
