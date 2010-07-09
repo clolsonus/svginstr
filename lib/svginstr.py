@@ -286,7 +286,7 @@ class Global:
 
 
 
-class SVG:
+class Instrument:
 	default = {
 		'color': 'white',
 		'opacity': 1,
@@ -296,11 +296,11 @@ class SVG:
 		'font-weight': 'normal',
 	}
 
-	def __init__(self, filename, svg = ""):
+	def __init__(self, filename, w, h = None, desc = None):
 		self.x = 0
 		self.y = 0
 		self.indent = 0
-		self.matrices = [Global.matrix.copy()]
+		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(200, -200).invert()]
 		self.matrix = None
 		self.defs = []
 		self.trans = []
@@ -316,7 +316,15 @@ class SVG:
 			self._write('<?xml version="1.0" standalone="no"?>')
 			self._write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
 			self._write()
-			self._write('<svg %s xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' % svg)
+			self._write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
+					% (R(w), R(h or w), 0, 0, 200, 200))
+
+			if desc:
+				self.description(desc)
+
+			self.write('<g font-family="%(font-family)s" transform="translate(100, 100)">' % self.default)
+			self.write('<rect x="-100" y="-100" width="200" height="200" fill="none"/>')
+			#self.chequer()
 
 		except IOError, (errno, strerror):
 			raise Error("I/O error(%s): %s" % (errno, strerror))
@@ -333,6 +341,7 @@ class SVG:
 			for i in self.contents:
 				self._write(i)
 
+			self._write('</g>')
 			self._write("</svg>\n")
 			self.file.close()
 
@@ -397,9 +406,9 @@ class SVG:
 
 		self.write('<g%s>' % attr)
 
-		self.matrices.append(self.matrix.multiply(self.matrices[-1]))
+		self.matrix_stack.append(self.matrix.multiply(self.matrix_stack[-1]))
 
-		x, y = self.matrices[-1].copy().invert().transform(0, 1)
+		x, y = self.matrix_stack[-1].copy().invert().transform(0, 1)
 		self.unit = 0.01 * sqrt(x * x + y * y)
 
 		self.reset()
@@ -407,7 +416,7 @@ class SVG:
 
 	def end(self):
 		self.write('</g>')
-		self.matrices.pop()
+		self.matrix_stack.pop()
 
 	def angle(self, alpha):
 		return alpha - 90
@@ -483,6 +492,56 @@ class SVG:
 				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], attrib))
 		self.end()
 
+	def chequer(self, size = 10, color = "lightgrey"):
+		" fake transparency  ;-) "
+		for y in range(20):
+			for x in range(20):
+				if (x + y) & 1:
+					continue
+				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
+						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
+
+	def arctext(self, startangle, r, text, size = None, font = None, color = None):
+		if not font:
+			font = self.font
+		if not size:
+			size = self.size
+		if not color:
+			color = self.color
+		r = R(r)
+		self.write('<g transform="rotate(%s)">' % startangle)
+		self.write('<defs>')
+		self.write('<path id="arctext" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
+		self.write('</defs>')
+		self.write('<text fill="%s" font-family="%s" font-size="%s">' % (color, font, R(size)))
+		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
+		self.write('</text>')
+		self.write('</g>')
+
+	def screw(self, scale, rot = None):
+		if rot == None:
+			rot = random() * 180
+
+		hole = RadialGradient()
+		hole.stop("0%", 0, alpha = 1)
+		hole.stop("30%", 0, alpha = 1)
+		hole.stop("61%", 0, alpha = 0)
+
+		head = RadialGradient("50%", "50%", "70%", "0%", "0%")
+		head.stop("0%", 60)
+		head.stop("90%", 25)
+		head.stop("100%", 10)
+
+		if self.scale(scale).translate(self.x, self.y).begin():
+			self.gradient(hole).disc(100)
+			self.gradient(head).disc(50)
+			if self.rotate(rot).begin():
+				self.rectangle(100, 19, color = "#1a1a1a")
+			self.end()
+		self.end()
+
+	def xml(self, name):
+		return _xml(self, name)
 
 	# positioning methods
 	def at_origin(self):
@@ -590,74 +649,6 @@ class SVG:
 
 
 
-class Instrument(SVG):
-	def __init__(self, filename, w, h = None, desc = None):
-		h = h or w
-		# matrix that turns svginstr's coordinates into OpenGL UV coordinates
-		Global.matrix = Matrix().translate(-0.5, -0.5).scale(200, -200).invert()
-		SVG.__init__(self, filename, 'width="%spx" height="%spx" viewBox="%s %s %s %s"' % \
-				(R(w), R(h), 0, 0, 200, 200))
-		if desc:
-			self.description(desc)
-		self.write('<g font-family="%(font-family)s" transform="translate(100, 100)">' % self.default)
-		self.write('<rect x="-100" y="-100" width="200" height="200" fill="none"/>')
-		self.default = dict(SVG.default)
-		#self.chequer()
-
-	def __del__(self):
-		self.write('</g>')
-		SVG.__del__(self)
-
-	def chequer(self, size = 10, color = "lightgrey"):
-		" fake transparency  ;-) "
-		for y in range(20):
-			for x in range(20):
-				if (x + y) & 1:
-					continue
-				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
-						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
-
-	def arctext(self, startangle, r, text, size = None, font = None, color = None):
-		if not font:
-			font = self.font
-		if not size:
-			size = self.size
-		if not color:
-			color = self.color
-		r = R(r)
-		self.write('<g transform="rotate(%s)">' % startangle)
-		self.write('<defs>')
-		self.write('<path id="foo" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
-		self.write('</defs>')
-		self.write('<text fill="%s" font-family="%s" font-size="%s">' % (color, font, R(size)))
-		self.write('<textPath xlink:href="#foo">%s</textPath>' % text)
-		self.write('</text>')
-		self.write('</g>')
-
-	def screw(self, scale, rot = None):
-		if rot == None:
-			rot = random() * 180
-
-		hole = RadialGradient()
-		hole.stop("0%", 0, alpha = 1)
-		hole.stop("30%", 0, alpha = 1)
-		hole.stop("61%", 0, alpha = 0)
-
-		head = RadialGradient("50%", "50%", "70%", "0%", "0%")
-		head.stop("0%", 60)
-		head.stop("90%", 25)
-		head.stop("100%", 10)
-
-		if self.scale(scale).translate(self.x, self.y).begin():
-			self.gradient(hole).disc(100)
-			self.gradient(head).disc(50)
-			if self.rotate(rot).begin():
-				self.rectangle(100, 19, color = "#1a1a1a")
-			self.end()
-		self.end()
-
-	def xml(self, name):
-		return _xml(self, name)
 
 
 
