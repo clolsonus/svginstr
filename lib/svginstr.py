@@ -330,8 +330,8 @@ class Instrument:
 			self.write('<rect x="-100" y="-100" width="200" height="200" fill="none"/>')
 			#self.chequer()
 
-		except IOError, (errno, strerror):
-			raise Error("I/O error(%s): %s" % (errno, strerror))
+		except IOError as error:
+			raise Error("I/O error(%s): %s" % error)
 
 	def __del__(self):
 		try:
@@ -349,8 +349,8 @@ class Instrument:
 			self._write("</svg>\n")
 			self.file.close()
 
-		except IOError, (errno, strerror):
-			raise Error("I/O error(%s): %s" % (errno, strerror))
+		except IOError as error:
+			raise Error("I/O error(%s): %s" % error)
 
 	def _write(self, s = ""):
 		""" For internal purposes only. Don't use from outside! """
@@ -370,8 +370,8 @@ class Instrument:
 			elif s.startswith('<') and not s.startswith('</') and not s.endswith('/>'):
 				self.indent += 1
 
-		except IOError, (errno, strerror):
-			raise Error("I/O error(%s): %s" % (errno, strerror))
+		except IOError as error:
+			raise Error("I/O error(%s): %s" % error)
 
 
 	# general methods
@@ -391,7 +391,7 @@ class Instrument:
 		""" return copy of class defaults with dic settings merged in """
 		p = dict(self.default)
 		p.update(dic)
-		for k, v in odic.iteritems():
+		for k, v in odic.items():
 			if not v:
 				continue
 			if k[0] == '#':
@@ -681,23 +681,23 @@ class _xml:
 			self.write('<PropertyList>\n')
 			self.write('\t<path>%s.ac</path>\n' % filename)
 
-		except IOError, (errno, strerror):
-			raise Error("I/O error(%s): %s" % (errno, strerror))
+		except IOError as error:
+			raise Error("I/O error(%s): %s" % error)
 
 	def __del__(self):
 		try:
 			self.write("</PropertyList>\n")
 			self.file.close()
 
-		except IOError, (errno, strerror):
-			raise Error("I/O error(%s): %s" % (errno, strerror))
+		except IOError as error:
+			raise Error("I/O error(%s): %s" % error)
 
 	def write(self, s):
 		try:
 			self.file.write(s)
 
-		except IOError, (errno, strerror):
-			raise Error("I/O error(%s): %s" % (errno, strerror))
+		except IOError as error:
+			raise Error("I/O error(%s): %s" % error)
 
 	def animation(self, objname, prop, points):
 		self.write('\t<animation>\n')
@@ -755,7 +755,7 @@ def frange(start, end = None, step = None):
 
 	count = int(ceil((end - start) / step))
 	L = [None,] * count
-	for i in xrange(count):
+	for i in range(count):
 		L[i] = start + i * step
 
 	return L
