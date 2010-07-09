@@ -30,7 +30,7 @@ try:
 				a.tick(i, 82, 99.5, 3)
 
 			a.tick(80, 81, 99.5, 3, color = "#ffc000")
-			a.tick(110, 70, 99.5, 3.3, color = "red")
+			a.tick(110, 70, 99.5, 3.3, color = "#c00000")
 
 			fontsize = 20
 			a.at(-60, 38).text("0", fontsize)
@@ -67,23 +67,32 @@ try:
 
 	if True:
 		if 0:
-			a.translate(88, -12).begin()    # separate (for final rendering)
+			a.translate(88, -12).begin()       # separate (for final rendering)
 			a.begin()
 		else:
 			a.translate(-12.5, -12.5).begin()  # centered (for tests)
 			a.rotate(-113).begin()
 
-		top = Path(-3, -30).rel().up(30).lineto(3, -19).lineto(3, 19).down(30).close()
+		# white tip
+		top = Path(-3, -30).up(30).lineto(3, -19).lineto(3, 19).down(30).close()
 		a.write('<path d="%s" fill="#fff0d0" stroke="#000000" stroke-width="0.1"/>' % str(top))
 
-		a.at(0.3, -50).text("1", color = "#101010")
-
-		bot = Path(-3, -30).rel().down(50).arc(7, 7, 0, 1, 0, 6, 0).up(50).close()
+		# dark parts
+		bot = Path(-3, -30).down(50).arc(7, 7, 0, 1, 0, 6, 0).up(50).close()
 		a.write('<path d="%s" fill="#242424" stroke="#181818" stroke-width="0.6"/>' % str(bot))
+
+		# counter weight overlay
+		weight = RadialGradient().stop("0%", 38).stop("90%", 35).stop("100%", 28)
+		a.at(0, 26.25).gradient(weight).disc(7)
+
+		# engine number
+		a.at(0.3, -50).text("1", color = "#101010")
 
 		#top.debug(a)
 		#bot.debug(a)
 		a.end()
+
+		# top cap
 		a.gradient(g).disc(9)
 	a.end()
 

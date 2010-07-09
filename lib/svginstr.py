@@ -81,21 +81,20 @@ class Matrix:
 
 class Path:
 	def __init__(self, x = None, y = None):
-		self.dbg = False
-		self.dbgpoints = []
-		self.dbglines = []
+		self.x = x or 0
+		self.y = y or 0
+		self.points = []
+		self.lines = []
 		self.absolute = True
-		self.str = ""
+		self.path = ""
 
 		if x != None and y != None:
-			self.x, self.y = x, y
-			self.str += "M %s %s" % (x, y)
-			self.dbgpoints.append((x, y))
-		else:
-			self.x = self.y = 0
+			self.moveto(x, y)
+
+		self.absolute = False
 
 	def __str__(self):
-		return self.str
+		return self.path
 
 	def _assert_multi_args(self, args, num):
 		if len(args) % num:
@@ -118,16 +117,16 @@ class Path:
 		return self
 
 	def moveto(self, x, y):
-		self.str += " %s %s %s" % (['m', 'M'][self.absolute], x, y)
+		self.path += " %s %s %s" % (['m', 'M'][self.absolute], x, y)
 		self._update(x, y)
-		self.dbgpoints.append((self.x, self.y))
+		self.points.append((self.x, self.y))
 		return self
 
 	def moveto_polar(self, angle, radius):
 		x, y = radius * sind(angle), radius * cosd(angle)
-		self.str += " %s %s %s" % (['m', 'M'][self.absolute], x, y)
+		self.path += " %s %s %s" % (['m', 'M'][self.absolute], x, y)
 		self._update(x, y)
-		self.dbgpoints.append((self.x, self.y))
+		self.points.append((self.x, self.y))
 		return self
 
 	def lineto(self, *args):
@@ -135,9 +134,9 @@ class Path:
 		while args:
 			x, y = args[0], args[1]
 			args = args[2:]
-			self.str += " %s %s %s" % (['l', 'L'][self.absolute], x, y)
+			self.path += " %s %s %s" % (['l', 'L'][self.absolute], x, y)
 			self._update(x, y)
-			self.dbgpoints.append((self.x, self.x))
+			self.points.append((self.x, self.y))
 		return self
 
 	def lineto_polar(self, *args):
@@ -145,68 +144,78 @@ class Path:
 		while args:
 			angle, radius, args = args[0], args[1], args[2:]
 			x, y = radius * sind(angle), radius * cosd(angle)
-			self.str += " %s %s %s" % (['l', 'L'][self.absolute], x, y)
+			self.path += " %s %s %s" % (['l', 'L'][self.absolute], x, y)
 			self._update(x, y)
-			self.dbgpoints.append((self.x, self.y))
+			self.points.append((self.x, self.y))
 		return self
 
 	def close(self):
-		self.str += " z"
+		self.path += " z"
+		return self
+
+	def cubic_bezier(self, x1, y1, x2, y2, x, y):
+		self.path += " %s %s %s %s %s %s %s" % (['c', 'C'][self.absolute], x1, y1, x2, y2, x, y)
+		self._update(x, y)
+		self.points.append((self.x, self.y))
+		#self.points.append((x1, y1))
+		#self.points.append((x2, y2))
+		#self.lines.append((x1, y1, x2, y2), (x2, y2, x, y))
+		return self
+
+	def smooth_cubic_bezier(self, x2, y2, x, y):
+		self.path += " %s %s %s %s %s %s %s" % (['s', 'S'][self.absolute], x2, y2, x, y)
+		self._update(x, y)
+		self.points.append((self.x, self.y))
+		#self.points.append((x, y))
+		#self.points.append((x2, y2))
+		return self
+
+	def quad_bezier(selfs, x1, y1, x, y):
+		self.path += " %s %s %s %s %s" % (['q', 'Q'][self.absolute], x1, y1, x, y)
+		self._update(x, y)
+		self.points.append((self.x, self.y))
+		#self.points.append((x1, y1))
+		#self.points.append((x, y))
+		return self
+
+	def smooth_quad_bezier(self, x, y):
+		self.path += " %s %s %s" % (['t', 'T'][self.absolute], x, y)
+		self._update(x, y)
+		self.points.append((self.x, self.y))
+		return self
+
+	def arc(self, rx, ry, rot, large, sweep, x, y):
+		self.path += " %s %s, %s %s %s, %s %s, %s" % (['a', 'A'][self.absolute], rx, ry, rot, large, sweep, x, y)
+		self._update(x, y)
+		self.points.append((self.x, self.y))
 		return self
 
 	def right(self, dx):
-		self.str += " h %s" % dx
+		self.path += " h %s" % dx
 		self.x += dx
-		self.dbgpoints.append((self.x, self.y))
+		self.points.append((self.x, self.y))
 		return self
 
 	def left(self, dx):
 		return self.right(-dx)
 
 	def down(self, dy):
-		self.str += " v %s" % dy
+		self.path += " v %s" % dy
 		self.y += dy
-		self.dbgpoints.append((self.x, self.y))
+		self.points.append((self.x, self.y))
 		return self
 
 	def up(self, dy):
 		return self.down(-dy)
 
-	def cubic_bezier(self, x1, y1, x2, y2, x, y): # TODO c
-		self._update(x, y)
-		self.dbgpoints.append((self.x, self.y))
-		self.dbgpoints.append((x1, y1))
-		self.dbgpoints.append((x2, y2))
-		self.dbglines.append((x1, y1, x2, y2), (x2, y2, x, y))
-		return self
-
-	def smooth_cubic_bezier(self, x2, y2, x, y):  # TODO s
-		self.dbgpoints.append((x, y))
-		self.dbgpoints.append((x2, y2))
-		self.dbglines.append((x2, y2, x, y))
-		return self
-
-	def quad_bezier(selfs, x1, y1, x, y):  # TODO q
-		self.dbgpoints.append((x1, y1))
-		self.dbgpoints.append((x, y))
-		self.dbglines.append((x1, y1, x, y))
-		return self
-
-	def smooth_quad_bezier(self, x, y): # TODO t
-		self.dbgpoints.append((x, y))
-		return self
-
-	def arc(self, rx, ry, rot, large, sweep, x, y):
-		self.dbgpoints.append((x, y))
-		self.str += " %s %s, %s %s %s, %s %s, %s" % (['a', 'A'][self.absolute], rx, ry, rot, large, sweep, x, y)
-		return self
-
 	def debug(self, instr):
-		for l in self.dbglines:
+		print self.points
+		print self.lines
+		for l in self.lines:
 			instr.write('<line x1="%s" y1="%s" x2="%s" y2="%s" stroke-width="%s" stroke="%s"/>' \
 					% (l[0], l[1], l[2], l[3], instr.unit * 0.5, 'white'))
-		for p in self.dbgpoints:
-			instr.write('<circle cx="%s" cy="%s" r="%s" fill="%s"/>' % (p[0], p[1], instr.unit, 'green'))
+		for p in self.points:
+			instr.write('<circle cx="%s" cy="%s" r="%s" fill="%s"/>' % (p[0], p[1], 0.75 * instr.unit, 'green'))
 
 
 
