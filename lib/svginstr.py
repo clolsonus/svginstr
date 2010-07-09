@@ -282,7 +282,7 @@ class RadialGradient(Gradient):
 class Global:
 	transform = []
 	style = []
-	matrix = None  # for OpenGL UV
+	matrices = {}
 
 
 
@@ -594,6 +594,17 @@ class Instrument:
 			return " transform=\"%s\"" % string.join(t, " ")
 		else:
 			return ""
+
+	def save_matrix(self, name):
+		Global.matrices[name] = self.matrix
+		self.matrix = Matrix()
+
+	def use_matrix(self, name):
+		if name not in Global.matrices:
+			raise Error("use_matrix: undefined matrix '%s'" % name)
+
+		self.matrix.multiply(Global.matrices[name])
+		return self
 
 	def translate(self, x, y = None):
 		if y == None:
