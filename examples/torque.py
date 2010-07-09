@@ -68,11 +68,13 @@ try:
 	if True:
 		if 0:
 			a.translate(88, -12).begin()    # separate (for final rendering)
+			a.begin()
 		else:
-			a.rotate(-113).translate(-12.5, -12.5).begin()  # centered (for tests)
+			a.translate(-12.5, -12.5).begin()  # centered (for tests)
+			a.rotate(-113).begin()
 
 		top = Path(-3, -30).rel().up(30).lineto(3, -19).lineto(3, 19).down(30).close()
-		a.write('<path d="%s" fill="#fff0c0" stroke="#000000" stroke-width="0.1"/>' % str(top))
+		a.write('<path d="%s" fill="#fff0d0" stroke="#000000" stroke-width="0.1"/>' % str(top))
 
 		a.at(0.3, -50).text("1", color = "#101010")
 
@@ -81,7 +83,8 @@ try:
 
 		#top.debug(a)
 		#bot.debug(a)
-		a.gradient(g).disc(10)
+		a.end()
+		a.gradient(g).disc(9)
 	a.end()
 
 
