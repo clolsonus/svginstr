@@ -314,9 +314,12 @@ class Instrument:
 			else:
 				self.file = open(filename, "w")
 			self._write('<?xml version="1.0" standalone="no"?>')
-			self._write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
+			self._write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '\
+					'"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
 			self._write()
-			self._write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
+			self._write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" '\
+					'xmlns="http://www.w3.org/2000/svg" '\
+					'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
 					% (R(w), R(h or w), 0, 0, 200, 200))
 
 			if desc:
@@ -382,7 +385,7 @@ class Instrument:
 		self.default.update(dic)
 
 	def getparams(self, dic, odic = {}):
-		" return copy of class defaults with dic settings merged in"
+		""" return copy of class defaults with dic settings merged in """
 		p = dict(self.default)
 		p.update(dic)
 		for k, v in odic.iteritems():
@@ -560,7 +563,7 @@ class Instrument:
 		return self
 
 	def polar_offset(self, angle, radius):
-		"""first choose the azimuth (angle), then go the distance (radius)!"""
+		""" first choose the azimuth (angle), then go the distance (radius)! """
 		a = self.angle(angle)
 		self.x = radius * cosd(a)
 		self.y = radius * sind(a)
