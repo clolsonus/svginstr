@@ -24,6 +24,6 @@ try:
 	a.at(50, 50).rectangle(50, 30, color = "green")
 
 
-except Error, e:
+except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e
 

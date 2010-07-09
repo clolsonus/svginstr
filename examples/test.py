@@ -54,6 +54,6 @@ try:
 		a.write('<path d="%s" fill="white" stroke="maroon" stroke-width="5" opacity="1"/>' % str(triangle))
 	a.end()
 
-except Error, e:
+except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e
 

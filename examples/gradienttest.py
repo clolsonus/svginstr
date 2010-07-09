@@ -35,6 +35,6 @@ try:
 		a.tick(30 * i, 77, 93, 4)
 
 
-except Error, e:
+except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e
 

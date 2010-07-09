@@ -64,6 +64,6 @@ try:
 		a.at(-11, 12).text("I0", fontsize)
 	a.end()
 
-except Error, e:
+except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e
 

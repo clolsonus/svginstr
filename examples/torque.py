@@ -101,6 +101,6 @@ try:
 	xml.animation("Lneedle", "sim/model/bo105/torque-pct", [0, 60, 120])
 	xml.animation("Rneedle", "sim/model/bo105/torque-pct", [0, 60, 120])
 
-except Error, e:
+except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e
 

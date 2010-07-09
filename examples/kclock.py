@@ -21,6 +21,6 @@ try:
 			angle = 6 + 30 * hour + 6 * min
 			a.tick(angle, 92.0, 98.0, 1.5)
 
-except Error, e:
+except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e
 
