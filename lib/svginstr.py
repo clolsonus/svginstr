@@ -313,6 +313,7 @@ class Instrument:
 				self.file = gzip.GzipFile(filename, "w")
 			else:
 				self.file = open(filename, "w")
+
 			self._write('<?xml version="1.0" standalone="no"?>')
 			self._write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '\
 					'"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
@@ -663,9 +664,6 @@ class Instrument:
 
 
 
-
-
-
 class _xml:
 	def __init__(self, parent, filename):
 		if not isinstance(parent, Instrument):
@@ -726,12 +724,12 @@ def R(f, digits = 8):
 
 
 def sind(a):
-	return sin(a * pi / 180)
+	return sin(a * pi / 180.0)
 
 
 
 def cosd(a):
-	return cos(a * pi / 180)
+	return cos(a * pi / 180.0)
 
 
 
@@ -757,12 +755,3 @@ def frange(start, end = None, step = None):
 		L[i] = start + i * step
 
 	return L
-
-
-
-def norm_angle(self, a):
-	while (a < 0):
-		a += 360
-	while (a >= 360):
-		a -= 360
-	return a
