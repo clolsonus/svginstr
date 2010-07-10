@@ -21,8 +21,6 @@ try:
 
 	a.arc(0, 360-0.001, 99, width = 2, color = "lightgreen")
 
-	a.at(50, 50).rectangle(50, 30, color = "green")
-
 
 except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e

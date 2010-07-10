@@ -383,9 +383,6 @@ class Instrument:
 	def description(self, s):
 		self._write('<desc>%s</desc>' % s)
 
-	def set(self, dic):
-		self.default.update(dic)
-
 	def getparams(self, dic, odic = {}):
 		""" return copy of class defaults with dic settings merged in """
 		p = dict(self.default)
@@ -399,11 +396,11 @@ class Instrument:
 				p[k] = v
 		return p
 
-	def begin(self, name = None):
-		attr = ""
+	def begin(self, name = None, **args):
 		if name:
-			attr += ' id="%s"' % name
+			args["id"] = name
 
+		attr = self._args_string(args)
 		if self.trans:
 			t = self.trans[:]
 			t.reverse()
@@ -433,7 +430,14 @@ class Instrument:
 		self.matrix = Matrix()
 
 	def _attrib(self):
-		return string.join([self._style(), self._trans()], " ")
+		return self._style() + self._trans()
+
+	def _args_string(self, dic):
+		""" turn dictionary into joined string of ' key="value"' """
+		s = ""
+		for key, value in dic.items():
+			s += ' %s="%s"' % (key.replace('_', '-'), value)
+		return s
 
 
 	# positioning methods
@@ -455,8 +459,7 @@ class Instrument:
 	def polar_offset(self, angle, radius):
 		""" first choose the azimuth (angle), then go the distance (radius)! """
 		a = self.angle(angle)
-		self.x = radius * cosd(a)
-		self.y = radius * sind(a)
+		self.x, self.y = radius * cosd(a), radius * sind(a)
 		return self
 
 
@@ -489,14 +492,17 @@ class Instrument:
 			return ""
 
 	def save_matrix(self, name):
-		Global.matrices[name] = self.matrix
+		Global.matrices[name] = (self.matrix, self.trans)
 		self.matrix = Matrix()
+		self.trans = []
 
 	def use_matrix(self, name):
 		if name not in Global.matrices:
 			raise Error("use_matrix: undefined matrix '%s'" % name)
 
-		self.matrix.multiply(Global.matrices[name])
+		self.matrix.multiply(Global.matrices[name][0])
+		for t in Global.matrices[name][1]:
+			self.trans.append(t)
 		return self
 
 	def translate(self, x, y = None):
@@ -575,12 +581,10 @@ class Instrument:
 	def square(self, width, color = None, dic = {}):
 		self.rectangle(width, width, color, dic)
 
-	def text(self, text, size = None, font = None, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color, 'font-family': font, '#font-size': size})
-		self.write('<text x="%s" y="%s" font-family="%s" font-size="%s" font-weight="%s" fill="%s" ' \
-				'text-anchor="middle"%s>%s</text>' \
-				% (self.x, self.y, p['font-family'], p['font-size'], p['font-weight'], p['color'], \
-				self._attrib(), text))
+	def text(self, text, **args):
+		# TODO color -> fill
+		self.write('<text x="%s" y="%s" text-anchor="middle"%s>%s</text>' \
+				% (self.x, self.y, self._args_string(args), text))
 		self.reset()
 
 	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
@@ -639,6 +643,10 @@ class Instrument:
 		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
 		self.write('</text>')
 		self.write('</g>')
+
+	def path(self, path, **args):
+		self.write('<path d="%s"%s/>' % (str(path), self._args_string(args) + self._attrib()))
+		self.reset()
 
 	def screw(self, scale, rot = None):
 		if rot == None:

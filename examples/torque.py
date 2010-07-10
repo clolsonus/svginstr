@@ -14,7 +14,7 @@ __doc__ = """
 try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
-	if a.region(-100, -100, 175, 175).begin():
+	if a.region(-100, -100, 175, 175).begin(fill = "white"):
 		#a.square(200, '#202020')
 		a.disc(100, '#202020')
 
@@ -32,17 +32,18 @@ try:
 			a.tick(80, 81, 99.5, 3, color = "#ffc000")
 			a.tick(110, 70, 99.5, 3.3, color = "#c00000")
 
-			fontsize = 20
-			a.at(-60, 38).text("0", fontsize)
-			a.at(-61, -8).text("20", fontsize)
-			a.at(-39, -46).text("40", fontsize)
-			a.at(0, -61).text("60", fontsize)
-			a.at(39, -46).text("80", fontsize)
-			a.at(56, -8).text("100", fontsize)
-			a.at(50, 38).text("120", fontsize)
+			if a.begin(font_size = 20):
+				a.at(-60, 38).text("0")
+				a.at(-61, -8).text("20")
+				a.at(-39, -46).text("40")
+				a.at(0, -61).text("60")
+				a.at(39, -46).text("80")
+				a.at(56, -8).text("100")
+				a.at(50, 38).text("120")
+			a.end()
 
-			a.at(0, 55).text("%", 17)
-			a.at(0, 75).text("TORQUE", 20)
+			a.at(0, 55).text("%", font_size = 17)
+			a.at(0, 75).text("TORQUE", font_size = 20)
 
 			a.at(0, -30).screw(0.12, 30)
 			a.at(0, 30).screw(0.12, 70)
@@ -60,11 +61,6 @@ try:
 
 
 	#-- needle --
-	g = RadialGradient("50%", "50%", "80%", "0%", "0%")
-	g.stop("0%", 60)
-	g.stop("90%", 20)
-	g.stop("100%", 5)
-
 	if True:
 		if 0:
 			a.translate(88, -12).begin()       # separate (for final rendering)
@@ -73,13 +69,11 @@ try:
 			a.translate(-12.5, -12.5).begin()  # centered (for tests)
 			a.rotate(-113).begin()
 
-		# white tip
-		top = Path(-3, -30).up(30).lineto(3, -19).lineto(3, 19).down(30).close()
-		a.write('<path d="%s" fill="#fff0d0" stroke="#000000" stroke-width="0.1"/>' % str(top))
+		tip = Path(-3, -30).up(30).lineto(3, -19).lineto(3, 19).down(30).close()
+		a.path(tip, fill = "#fff0d0", stroke = "#000000", stroke_width = 0.1)
 
-		# dark parts
-		bot = Path(-3, -30).down(50).arc(7, 7, 0, 1, 0, 6, 0).up(50).close()
-		a.write('<path d="%s" fill="#242424" stroke="#181818" stroke-width="0.6"/>' % str(bot))
+		tail = Path(-3, -30).down(50).arc(7, 7, 0, 1, 0, 6, 0).up(50).close()
+		a.path(tail, fill = "#242424", stroke = "#181818", stroke_width = 0.6)
 
 		# counter weight overlay
 		weight = RadialGradient().stop("0%", 38).stop("90%", 35).stop("100%", 28)
@@ -88,11 +82,15 @@ try:
 		# engine number
 		a.at(0.3, -50).text("1", color = "#101010")
 
-		#top.debug(a)
-		#bot.debug(a)
+		#tip.debug(a)
+		#tail.debug(a)
 		a.end()
 
 		# top cap
+		g = RadialGradient("50%", "50%", "80%", "0%", "0%")
+		g.stop("0%", 60)
+		g.stop("90%", 20)
+		g.stop("100%", 5)
 		a.gradient(g).disc(9)
 	a.end()
 
