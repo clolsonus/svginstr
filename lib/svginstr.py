@@ -283,9 +283,7 @@ class Global:
 	matrices = {}
 	attributes = {
 		'color': 'white',
-		'opacity': 1,
 		'fill': 'white',
-		'stroke_width': 1,
 		'font_family': 'Helvetica',
 		'font_weight': 'normal',
 		'font_size': 11,
