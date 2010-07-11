@@ -29,7 +29,7 @@ try:
 	a.gradient(radial).disc(98)
 	a.circle(11, 4)
 
-	a.at(50, 50).gradient(horizon).rectangle(90, 70)
+	a.at(50, 50).gradient(horizon).rectangle(90, 70, rx = 10)
 
 	for i in range(12):
 		a.tick(30 * i, 77, 93, 4)
