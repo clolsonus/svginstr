@@ -1,0 +1,95 @@
+svginstr is a set of classes that assist with the generation of instrument faces,
+which are written in the SVG (scalable vector graphics) format, and can then be
+converted to any other format, such as PNG (portable network graphics). The main
+advantage of this method is that image contents can be drawn algorithmically,
+which makes exact drawing of, for instance, scale ticks comparatively easy.
+
+Several instruments can be defined in one Python driver file. Reusable gradients
+and paths can be defined first, followed by one or more Instrument() declaration
+and its/their drawing instructions.
+
+  Instrument(<filename>, <width> [, <height> [, <description]])
+
+  filename    ... where to write the SVG file. If the name ends with '.svgz' or
+                  '.svg.gz', then the file will be written gzipped. (inkscape
+                  can open that.)
+  width       ... natural width of the generated file
+  height      ... natural height of the generated file. Same as width if undefined.
+  description ... optional description string
+
+
+
+The Instrument() class constructor creates the SVG file and sets up a coordinate
+system with origin (0, 0) at the center, and x and y ranging from [-100..100]
+for the given width and height. Coordinates can therefore also be seen as "percent
+from center to margin". A centered disc with radius 100 fills the whole area (if
+that's a square). Note that positive x coordinates are right, but positive
+y coordinates are down! This is an SVG convention, and retaining it allows to use
+raw SVG code and the SVG documentation as a supplement.
+
+The Instrument class offers different categories of methods:
+
+  <drawing commands>:
+     square(), rectangle(), disc(), circle(), path(), tick(), arc(), text(),
+     arctext(),
+
+  <grouping commands>:
+     begin(), end(), set_matrix()
+
+  <positioning commands>:
+     at_origin(), at(), at_polar(), offset(), polar_offset()
+
+  <transformation commands>:
+     translate(), rotate(), scale(), xscale(), yscale(), xskew(), yskew(),
+     matrix(), use_matrix()
+
+  <modifiers>:
+     gradient(), style()
+
+
+
+A lot of svginstr's methods return a reference to their parent class, so they
+can be concatenated. This reduces the number of code lines and can improve
+readability. The following two code examples are equivalent:
+
+(1) clock.at(30, 50).polar_offset(30, 18).disc(10)  # concatenated methods
+
+(2) clock.at(30, 50)                                # separate method calls
+    clock.polar_offset(30, 18)
+    clock.disc(10)
+
+In a chain of concatenated methods a drawing or a grouping command is last. Nothing
+can follow them, as they don't return a class reference.
+
+
+
+
+
+
+To get and build the latest source, do this:
+
+  $ git clone git://gitorious.org/svginstr/svginstr.git
+  $ make png
+
+
+
+
+
+
+Random Notes
+------------
+
+In all places where polar coordinates are expected, it's always angle first, then
+distance. That's the natural order. (You wouldn't go 10 km and only *then* look
+up the direction/azimuth, would you?)
+
+
+
+TODO
+fc-list
+
+inkscape
+
+svg2png
+
+
