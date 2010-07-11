@@ -24,8 +24,11 @@ check: $(SVGFILES)
 	@echo -e "\nchecking ..."
 	@for i in $(SVGFILES); do echo -en "\t$$i ... "; xmllint $$i >/dev/null && echo OK; done
 
+show: $(PNGFILES)
+	@for i in $(PNGFILES); do (display "$$i"&); done  ## 'display' is part of ImageMagick
+
 clean:
 	rm -f *.svg *.xml *.png
 
 help:
-	@echo "targets: svg png check clean help"
+	@echo "targets: svg png check show clean help"
