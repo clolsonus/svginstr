@@ -281,19 +281,30 @@ class RadialGradient(Gradient):
 
 class Global:
 	matrices = {}
+	attributes = {
+		'color': 'white',
+		'opacity': 1,
+		'fill': 'white',
+		'stroke-width': 1,
+		'font-family': 'Helvetica',
+		'font-weight': 'normal',
+		'font-size': 11,
+	}
+
+
+
+def set_global_attributes(**args):
+	for key, value in args.items():
+		key = key.replace('_', '-')
+		if value is None:
+			if key in Global.attributes:
+				del(Global.attributes[key])
+		else:
+			Global.attributes[key] = value
 
 
 
 class Instrument:
-	default = {
-		'color': 'white',
-		'opacity': 1,
-		'stroke-width': 1,
-		'font-family': 'Helvetica',
-		'font-size': 11,
-		'font-weight': 'normal',
-	}
-
 	def __init__(self, filename, w, h = None, desc = None):
 		self.x = 0
 		self.y = 0
@@ -324,7 +335,7 @@ class Instrument:
 			if desc:
 				self.description(desc)
 
-			self.write('<g font-family="%(font-family)s" transform="translate(100, 100)">' % self.default)
+			self.write('<g transform="translate(100, 100)"%s>' % self._args_string(Global.attributes))
 			self.write('<rect x="-100" y="-100" width="200" height="200" fill="none"/>')
 
 		except IOError as error:
@@ -383,7 +394,7 @@ class Instrument:
 
 	def getparams(self, dic, odic = {}):
 		""" return copy of class defaults with dic settings merged in """
-		p = dict(self.default)
+		p = dict(Global.attributes)
 		p.update(dic)
 		for k, v in odic.items():
 			if not v:
