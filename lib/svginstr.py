@@ -280,7 +280,7 @@ class RadialGradient(Gradient):
 
 
 class Global:
-	matrices = {}
+	transforms = {}
 	attributes = {
 		'color': 'white',
 		'fill': 'white',
@@ -490,16 +490,16 @@ class Instrument:
 			return ""
 
 	def save_matrix(self, name):
-		Global.matrices[name] = (self.matrix, self.trans)
+		Global.transforms[name] = (self.matrix, self.trans)
 		self.matrix = Matrix()
 		self.trans = []
 
 	def use_matrix(self, name):
-		if name not in Global.matrices:
+		if name not in Global.transforms:
 			raise Error("use_matrix: undefined matrix '%s'" % name)
 
-		self.matrix.multiply(Global.matrices[name][0])
-		for t in Global.matrices[name][1]:
+		self.matrix.multiply(Global.transforms[name][0])
+		for t in Global.transforms[name][1]:
 			self.trans.append(t)
 		return self
 
