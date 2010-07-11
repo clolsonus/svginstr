@@ -280,8 +280,6 @@ class RadialGradient(Gradient):
 
 
 class Global:
-	transform = []
-	style = []
 	matrices = {}
 
 
@@ -466,9 +464,8 @@ class Instrument:
 	# style methods
 	def _style(self):
 		""" return assembled style """
-		t = Global.style + self.styles
-		if t:
-			return " style=\"%s\"" % string.join(t, "; ")
+		if self.styles:
+			return " style=\"%s\"" % string.join(self.styles, "; ")
 		else:
 			return ""
 
@@ -485,9 +482,8 @@ class Instrument:
 	# transform methods
 	def _trans(self):
 		""" return assembled transformation """
-		t = Global.transform + self.trans
-		if t:
-			return " transform=\"%s\"" % string.join(t, " ")
+		if self.trans:
+			return " transform=\"%s\"" % string.join(self.trans, " ")
 		else:
 			return ""
 
