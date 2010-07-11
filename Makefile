@@ -1,4 +1,4 @@
-all: svg
+all: svg png
 
 svg:
 	$(MAKE) -C examples svg
