@@ -95,6 +95,7 @@ try:
 	a.end()
 
 
+	# generate animation XML file for FlightGear
 	xml = a.xml("torque")
 	xml.animation("Lneedle", "sim/model/bo105/torque-pct", [0, 60, 120])
 	xml.animation("Rneedle", "sim/model/bo105/torque-pct", [0, 60, 120])

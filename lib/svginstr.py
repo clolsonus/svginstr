@@ -344,17 +344,17 @@ class Instrument:
 	def __del__(self):
 		try:
 			if self.defs:
-				self._write("<defs>")
+				self._write('<defs>')
 				for d in self.defs:
 					for i in d.code():
 						self._write(i)
-				self._write("</defs>")
+				self._write('</defs>')
 
 			for i in self.contents:
 				self._write(i)
 
 			self._write('</g>')
-			self._write("</svg>\n")
+			self._write('</svg>\n')
 			self.file.close()
 
 		except IOError as error:
@@ -601,7 +601,7 @@ class Instrument:
 		b = min(begin, end)
 		e = max(begin, end) - b
 		if radius == 0:
-			radius = 0.00000000001
+			radius = 10e-10
 
 		attrib = "" # FIXME self._attrib()
 		self.rotate(R(b))
@@ -626,7 +626,6 @@ class Instrument:
 		self.end()
 
 	def chequer(self, size = 10, color = "lightgrey"):
-		" fake transparency  ;-) "
 		for y in range(20):
 			for x in range(20):
 				if (x + y) & 1:
@@ -655,9 +654,9 @@ class Instrument:
 		self.write('<path d="%s"%s/>' % (str(path), self._args_string(args) + self._attrib()))
 		self.reset()
 
-	def screw(self, scale, rot = None):
-		if rot == None:
-			rot = random() * 180
+	def screw(self, scale, rotation = None):
+		if rotation == None:
+			rotation = random() * 180
 
 		hole = RadialGradient()
 		hole.stop("0%", 0, alpha = 1)
@@ -672,7 +671,7 @@ class Instrument:
 		if self.scale(scale).translate(self.x, self.y).begin():
 			self.gradient(hole).disc(100)
 			self.gradient(head).disc(50)
-			if self.rotate(rot).begin():
+			if self.rotate(rotation).begin():
 				self.rectangle(100, 19, color = "#1a1a1a")
 			self.end()
 		self.end()
