@@ -70,10 +70,10 @@ try:
 			a.rotate(-113).begin()
 
 		tip = Path(-3, -30).up(30).lineto(3, -19).lineto(3, 19).down(30).close()
-		a.path(tip, fill = "#fff0d0", stroke = "#000000", stroke_width = 0.1)
+		a.shape(tip, fill = "#fff0d0", stroke = "#000000", stroke_width = 0.1)
 
 		tail = Path(-3, -30).down(50).arc(7, 7, 0, 1, 0, 6, 0).up(50).close()
-		a.path(tail, fill = "#242424", stroke = "#181818", stroke_width = 0.6)
+		a.shape(tail, fill = "#242424", stroke = "#181818", stroke_width = 0.6)
 
 		# counter weight overlay
 		weight = RadialGradient().stop("0%", 38).stop("90%", 35).stop("100%", 28)

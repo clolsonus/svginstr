@@ -49,7 +49,7 @@ try:
 
 	if a.scale(0.8).rotate(60).translate(-20, -50).begin():
 		triangle = Path().abs().moveto_polar(0, 20).lineto_polar(120, 20, -120, 20).close()
-		a.path(triangle, fill = "white", stroke = "maroon", stroke_width = 5)
+		a.shape(triangle, fill = "white", stroke = "maroon", stroke_width = 5)
 	a.end()
 
 except Error as e:

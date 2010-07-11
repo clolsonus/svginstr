@@ -644,7 +644,7 @@ class Instrument:
 		self.write('</text>')
 		self.write('</g>')
 
-	def path(self, path, **args):
+	def shape(self, path, **args):
 		self.write('<path d="%s"%s/>' % (str(path), self._args_string(args) + self._attrib()))
 		self.reset()
 
