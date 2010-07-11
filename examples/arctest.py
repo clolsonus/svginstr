@@ -13,7 +13,7 @@ __doc__ = """
 
 try:
 	a = Instrument("arctest.svg", 512, 512, "arctest")
-	a.disc(98, 'black')
+	a.disc(98, color = 'black')
 
 	for i in range(0, 360, 20):
 		a.arc(0, i, 98.0 * i / 360, width = 2, color = "lightyellow")

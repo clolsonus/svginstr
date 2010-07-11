@@ -30,13 +30,11 @@ try:
 	for i in frange(0, 10, 0.1):	# scale values, not angles in degree!
 		a.tick(i, 90, 96, 0.5)
 
-	#a.default['color'] = "rgb(100, 200, 255)"
-
 	# fc-list tells you the names of available fonts on Linux  (fc ... font cache)
-	a.at(0, -15).text("FlightGear", size = 20, font = "Lucida Sans", color = "yellow")
-	a.at(0, 55).text("SVG", size = 60, font = "Luxi Mono", color = "red")
+	a.at(0, -15).text("FlightGear", size = 20, font_family = "Lucida Sans", color = "yellow")
+	a.at(0, 55).text("SVG", size = 60, font_family = "Luxi Mono", color = "red")
 
-	a.arctext(210, 80, "Better than MetaPost", size = 15, color = "lightblue", font = "Bitstream Vera Serif")
+	a.arctext(210, 80, "Better than MetaPost", size = 15, color = "lightblue", font_family = "Bitstream Vera Serif")
 
 	if a.rotate(0).begin():  # example for writing raw svg
 		a.write('<path d="M0,-94 A94,94 0 0,1 94,0" fill="none" stroke-width="4.5" stroke="yellow" opacity="0.8"/>')
@@ -46,12 +44,12 @@ try:
 
 	# switch from scale angles back to normal svg angles (0-360)
 	a.angle = lambda x: x - 90
-	a.arc(0, 45, 70, width = 5, color = "orange", opacity = 1)
+	a.arc(0, 45, 70, width = 5, color = "orange")
 
 
 	if a.scale(0.8).rotate(60).translate(-20, -50).begin():
 		triangle = Path().abs().moveto_polar(0, 20).lineto_polar(120, 20, -120, 20).close()
-		a.path(triangle, fill = "white", stroke = "maroon", stroke_width = 5, opacity = 1)
+		a.path(triangle, fill = "white", stroke = "maroon", stroke_width = 5)
 	a.end()
 
 except Error as e:

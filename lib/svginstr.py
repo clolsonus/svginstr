@@ -285,17 +285,16 @@ class Global:
 		'color': 'white',
 		'opacity': 1,
 		'fill': 'white',
-		'stroke-width': 1,
-		'font-family': 'Helvetica',
-		'font-weight': 'normal',
-		'font-size': 11,
+		'stroke_width': 1,
+		'font_family': 'Helvetica',
+		'font_weight': 'normal',
+		'font_size': 11,
 	}
 
 
 
 def set_global_attributes(**args):
 	for key, value in args.items():
-		key = key.replace('_', '-')
 		if value is None:
 			if key in Global.attributes:
 				del(Global.attributes[key])
@@ -305,7 +304,7 @@ def set_global_attributes(**args):
 
 
 class Instrument:
-	def __init__(self, filename, w, h = None, desc = None):
+	def __init__(self, filename, w, h = None, desc = None, **args):
 		self.x = 0
 		self.y = 0
 		self.indent = 0
@@ -335,7 +334,9 @@ class Instrument:
 			if desc:
 				self.description(desc)
 
-			self.write('<g transform="translate(100, 100)"%s>' % self._args_string(Global.attributes))
+			attributes = Global.attributes.copy()
+			attributes.update(args)
+			self.write('<g transform="translate(100, 100)"%s>' % self._args_string(attributes))
 			self.write('<rect x="-100" y="-100" width="200" height="200" fill="none"/>')
 
 		except IOError as error:
@@ -392,19 +393,6 @@ class Instrument:
 	def description(self, s):
 		self._write('<desc>%s</desc>' % s)
 
-	def getparams(self, dic, odic = {}):
-		""" return copy of class defaults with dic settings merged in """
-		p = dict(Global.attributes)
-		p.update(dic)
-		for k, v in odic.items():
-			if not v:
-				continue
-			if k[0] == '#':
-				p[k[1:]] = R(v)
-			else:
-				p[k] = v
-		return p
-
 	def begin(self, name = None, **args):
 		if name:
 			args["id"] = name
@@ -444,9 +432,14 @@ class Instrument:
 	def _args_string(self, dic):
 		""" turn dictionary into joined string of ' key="value"' """
 		s = ""
-		for key, value in dic.items():
-			s += ' %s="%s"' % (key.replace('_', '-'), value)
+		for key in sorted(dic.keys()):
+			s += ' %s="%s"' % (key.replace('_', '-'), dic[key])
 		return s
+
+	def _map_args(self, dic, **args):
+		for k, v in args.items():
+			if v != None:
+				dic[k] = v
 
 
 	# positioning methods
@@ -566,36 +559,42 @@ class Instrument:
 
 
 	# drawing primitives
-	def circle(self, radius, width, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color})
-		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s" stroke="%s"%s/>' \
-				% (self.x, self.y, R(radius), R(width), p['color'], self._attrib()))
+	def circle(self, radius, width, color = None, **args):
+		self._map_args(args, stroke = color)
+		if color == None:
+			args['stroke'] = Global.attributes['color']   ## FIXME
+		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s"%s/>' \
+				% (self.x, self.y, R(radius), R(width), self._attrib() + self._args_string(args)))
 		self.reset()
 
-	def disc(self, radius, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color})
-		self.write('<circle cx="%s" cy="%s" r="%s" fill="%s"%s/>' \
-				% (self.x, self.y, R(radius), p['color'], self._attrib()))
+	def disc(self, radius, color = None, **args):
+		self._map_args(args, fill = color)
+		self.write('<circle cx="%s" cy="%s" r="%s"%s/>' \
+				% (self.x, self.y, R(radius), self._attrib() + self._args_string(args)))
 		self.reset()
 
-	def rectangle(self, width, height, color = None, dic = {}):
-		p = self.getparams(dic, {'color': color})
-		self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"%s/>' % \
-				(self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), \
-				color, self._attrib()))
+	def rectangle(self, width, height, color = None, **args):
+		self._map_args(args, fill = color)
+		self.write('<rect x="%s" y="%s" width="%s" height="%s"%s/>' \
+				% (self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), \
+				self._attrib() + self._args_string(args)))
 		self.reset()
 
-	def square(self, width, color = None, dic = {}):
-		self.rectangle(width, width, color, dic)
+	def square(self, width, color = None, **args):
+		self._map_args(args, fill = color)
+		self.write('<rect x="%s" y="%s" width="%s" height="%s"%s/>' \
+				% (self.x - 0.5 * width, self.y - 0.5 * width, R(width), R(width), \
+				self._attrib() + self._args_string(args)))
+		self.reset()
 
-	def text(self, text, **args):
-		# TODO color -> fill
+	def text(self, text, size = None, color = None, **args):
+		self._map_args(args, font_size = size, fill = color)
 		self.write('<text x="%s" y="%s" text-anchor="middle"%s>%s</text>' \
 				% (self.x, self.y, self._args_string(args), text))
 		self.reset()
 
-	def arc(self, begin, end, radius, width = None, color = None, opacity = None, dic = {}):
-		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
+	def arc(self, begin, end, radius, width = None, color = None, **args):
+		self._map_args(args, stroke = color, stroke_width = width)
 		begin = self.angle(begin)
 		end = self.angle(end)
 		b = min(begin, end)
@@ -603,26 +602,26 @@ class Instrument:
 		if radius == 0:
 			radius = 10e-10
 
-		attrib = "" # FIXME self._attrib()
 		self.rotate(R(b))
 		if self.x != 0 or self.y != 0:
 			self.translate(self.x, self.y)
 		self.begin()
-		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" ' \
-				'fill="none" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
-				(radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
-				p['stroke-width'], p['color'], p['opacity'], attrib))
+		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" fill="none"%s/>' \
+				% (radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
+				self._attrib() + self._args_string(args)))
 		self.end()
 
-	def tick(self, alpha, inner, outer, width = None, color = None, opacity = None, dic = {}):
-		p = self.getparams(dic, {'color': color, '#stroke-width': width, 'opacity': opacity})
-		attrib = "" # FIXME self._attrib()
+	def tick(self, alpha, inner, outer, width = None, color = None, **args):
+		self._map_args(args, stroke_width = width, stroke = color)
+		if color == None:
+			args['stroke'] = Global.attributes['color']   ## FIXME
+
 		if self.x != 0 or self.y != 0:
 			self.translate(self.x, self.y)
 		self.rotate(R(self.angle(alpha)))
 		self.begin()
-		self.write('<line x1="%s" x2="%s" stroke-width="%s" stroke="%s" opacity="%s"%s/>' %\
-				(R(inner), R(outer), p['stroke-width'], p['color'], p['opacity'], attrib))
+		self.write('<line x1="%s" x2="%s"%s/>' %\
+				(R(inner), R(outer), self._attrib() + self._args_string(args)))
 		self.end()
 
 	def chequer(self, size = 10, color = "lightgrey"):
@@ -630,22 +629,17 @@ class Instrument:
 			for x in range(20):
 				if (x + y) & 1:
 					continue
-				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' % \
-						(R(size * x - 100), R(size * y - 100), R(size), R(size), color))
+				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' \
+						% (R(size * x - 100), R(size * y - 100), R(size), R(size), color))
 
-	def arctext(self, startangle, r, text, size = None, font = None, color = None):
-		if not font:
-			font = self.font
-		if not size:
-			size = self.size
-		if not color:
-			color = self.color
-		r = R(r)
+	def arctext(self, startangle, radius, text, size = None, color = None, **args):
+		self._map_args(args, font_size = size, fill = color)
+		r = R(radius)
 		self.write('<g transform="rotate(%s)">' % startangle)
 		self.write('<defs>')
 		self.write('<path id="arctext" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
 		self.write('</defs>')
-		self.write('<text fill="%s" font-family="%s" font-size="%s">' % (color, font, R(size)))
+		self.write('<text%s>' % (self._attrib() + self._args_string(args)))
 		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
 		self.write('</text>')
 		self.write('</g>')

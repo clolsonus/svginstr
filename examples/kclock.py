@@ -13,7 +13,7 @@ __doc__ = """
 
 try:
 	a = Instrument("kclock.svg", 200.0, 200.0, "kclock")
-	a.disc(100.0, 'black')
+	a.disc(100.0, color = 'black')
 	for hour in range(12):
 		a.tick(30 * hour, 82.5, 98.0, 4.0)
 
