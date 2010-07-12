@@ -46,6 +46,9 @@ try:
 	a.angle = lambda x: x - 90
 	a.arc(0, 45, 70, width = 5, color = "orange")
 
+	# some tilted and rotated green lines
+	for i in range(16):
+		a.rotate(-6).line(8 * i - 65, -5, 8 * i - 55, 5, color = "green")
 
 	if a.scale(0.8).rotate(60).translate(-20, -50).begin():
 		triangle = Path().abs().moveto_polar(0, 20).lineto_polar(120, 20, -120, 20).close()

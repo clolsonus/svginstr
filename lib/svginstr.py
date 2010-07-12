@@ -612,6 +612,12 @@ class Instrument:
 		self.end()
 		self.reset()
 
+	def line(self, x1, y1, x2, y2, width = None, color = Global.attributes['color'], **args):
+		self._map_args(args, stroke_width = width, stroke = color)
+		self.write('<line x1="%s" y1="%s" x2="%s" y2="%s"%s/>' \
+				% (x1, y1, x2, y2, self._attrib(args)))
+		self.reset()
+
 	def tick(self, alpha, inner, outer, width = None, color = Global.attributes['color'], **args):
 		self._map_args(args, stroke_width = width, stroke = color)
 		a = self.angle(alpha)
