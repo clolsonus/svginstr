@@ -11,6 +11,10 @@ __doc__ = """
 """
 
 
+# defaults for all Instruments() defined in this driver file
+set_global_attributes(stroke = "#ffa000", stroke_width = 2)
+
+
 try:
 	# applying stop() methods separately ...
 	horizon = LinearGradient("0%", "0%", "0%", "100%")
