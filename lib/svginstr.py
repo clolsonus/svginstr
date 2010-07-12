@@ -335,7 +335,7 @@ class Instrument:
 			attributes = Global.attributes.copy()
 			attributes.update(args)
 			self.write('<g transform="translate(100, 100)"%s>' % self._args_string(attributes))
-			self.write('<rect x="-100" y="-100" width="200" height="200" fill="none"/>')
+			self.write('<rect x="-100" y="-100" width="200" height="200" stroke="none" fill="none"/>')
 
 		except IOError as error:
 			raise Error("I/O error(%s): %s" % error)
@@ -386,10 +386,10 @@ class Instrument:
 		self.contents.append(s)
 
 	def title(self, s):
-		self._write('<title>%s</title>' % s)
+		self.write('<title>%s</title>' % s)
 
 	def description(self, s):
-		self._write('<desc>%s</desc>' % s)
+		self.write('<desc>%s</desc>' % s)
 
 	def begin(self, name = None, **args):
 		if name:
