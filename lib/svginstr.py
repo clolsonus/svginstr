@@ -258,7 +258,7 @@ class Gradient:
 		return self
 
 	def code(self):
-		return ["<stop offset=\"%s\" style=\"stop-color:rgb(%s, %s, %s); stop-opacity:%s\"/>" \
+		return ['<stop offset="%s" style="stop-color:rgb(%s, %s, %s); stop-opacity:%s"/>' \
 				% b for b in self.stops]
 
 
@@ -274,7 +274,7 @@ class LinearGradient(Gradient):
 		return c
 
 	def code(self):
-		return ["<linearGradient id=\"%s\" x1=\"%s\" y1=\"%s\" x2=\"%s\" y2=\"%s\">" \
+		return ['<linearGradient id="%s" x1="%s" y1="%s" x2="%s" y2="%s">' \
 				% (self.name, self.x1, self.y1, self.x2, self.y2)] \
 				+ Gradient.code(self) + ["</linearGradient>"]
 
@@ -295,7 +295,7 @@ class RadialGradient(Gradient):
 		return c
 
 	def code(self):
-		return ["<radialGradient id=\"%s\" cx=\"%s\" cy=\"%s\" r=\"%s\" fx=\"%s\" fy=\"%s\">" \
+		return ['<radialGradient id="%s" cx="%s" cy="%s" r="%s" fx="%s" fy="%s">' \
 				% (self.name, self.cx, self.cy, self.r, self.fx, self.fy)] \
 				+ Gradient.code(self) + ["</radialGradient>"]
 
@@ -318,7 +318,7 @@ class Instrument:
 			self.W, self.H = 200.0 * w / h, 200.0
 		else:
 			self.W, self.H = 200.0, 200.0 * h / w
-		print('internal coordinate system: x = [-%s, +%s]   y = [-%s, +%s]' \
+		print('internal coordinate system: x = [-%s, +%s],  y = [-%s, +%s]' \
 				% (R(self.W * 0.5), R(self.W * 0.5), R(self.H * 0.5), R(self.H * 0.5)))
 
 		# matrix that transforms from internal svginstr coords to UV coords
