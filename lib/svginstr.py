@@ -612,14 +612,12 @@ class Instrument:
 
 	def tick(self, alpha, inner, outer, width = None, color = Global.attributes['color'], **args):
 		self._map_args(args, stroke_width = width, stroke = color)
-
-		if self.x != 0 or self.y != 0:
-			self.translate(self.x, self.y)
-
-		self.rotate(R(self.angle(alpha))).begin()
-		self.write('<line x1="%s" x2="%s"%s/>' %\
-				(R(inner), R(outer), self._attrib() + self._args_string(args)))
-		self.end()
+		a = self.angle(alpha)
+		self.write('<line x1="%s" y1="%s" x2="%s" y2="%s"%s/>' \
+				% (self.x + inner * cosd(a), self.y + inner * sind(a), \
+				self.x + outer * cosd(a), self.y + outer * sind(a), \
+				self._attrib() + self._args_string(args)))
+		self.reset()
 
 	def arctext(self, startangle, radius, text, size = None, color = None, **args):
 		self._map_args(args, font_size = size, fill = color)
