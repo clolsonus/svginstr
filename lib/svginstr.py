@@ -27,6 +27,7 @@ class Global:
 		'fill': 'white',
 		'font_family': 'Helvetica',
 		'font_size': 11,
+		'text_anchor': 'middle',
 	}
 
 
@@ -602,7 +603,7 @@ class Instrument:
 
 	def text(self, text, size = None, color = None, **args):
 		self._map_args(args, font_size = size, fill = color)
-		self.write('<text x="%s" y="%s" text-anchor="middle"%s>%s</text>' \
+		self.write('<text x="%s" y="%s"%s>%s</text>' \
 				% (self.x, self.y, self._attrib(args), text))
 		self.reset()
 
