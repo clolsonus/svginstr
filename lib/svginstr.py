@@ -414,6 +414,7 @@ class Instrument:
 	def end(self):
 		self.write('</g>')
 		self.matrix_stack.pop()
+		self.reset()
 
 	def angle(self, alpha):
 		return alpha - 90
@@ -589,7 +590,7 @@ class Instrument:
 	def text(self, text, size = None, color = None, **args):
 		self._map_args(args, font_size = size, fill = color)
 		self.write('<text x="%s" y="%s" text-anchor="middle"%s>%s</text>' \
-				% (self.x, self.y, self._args_string(args), text))
+				% (self.x, self.y, self._attrib(args), text))
 		self.reset()
 
 	def arc(self, begin, end, radius, width = None, color = None, **args):
@@ -609,6 +610,7 @@ class Instrument:
 				% (radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
 				self._attrib(args)))
 		self.end()
+		self.reset()
 
 	def tick(self, alpha, inner, outer, width = None, color = Global.attributes['color'], **args):
 		self._map_args(args, stroke_width = width, stroke = color)
@@ -630,6 +632,7 @@ class Instrument:
 		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
 		self.write('</text>')
 		self.write('</g>')
+		self.reset()
 
 	def chequer(self, size = 10, color = "lightgrey"):
 		for y in range(20):
@@ -638,6 +641,7 @@ class Instrument:
 					continue
 				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' \
 						% (R(size * x - 100), R(size * y - 100), R(size), R(size), color))
+		self.reset()
 
 	def screw(self, scale, rotation = None):
 		if rotation == None:
