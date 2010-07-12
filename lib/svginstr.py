@@ -557,10 +557,8 @@ class Instrument:
 
 
 	# drawing primitives
-	def circle(self, radius, width, color = None, **args):
+	def circle(self, radius, width, color = Global.attributes['color'], **args):
 		self._map_args(args, stroke = color)
-		if color == None:
-			args['stroke'] = Global.attributes['color']   ## FIXME
 		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s"%s/>' \
 				% (self.x, self.y, R(radius), R(width), self._attrib() + self._args_string(args)))
 		self.reset()
@@ -609,10 +607,8 @@ class Instrument:
 				self._attrib() + self._args_string(args)))
 		self.end()
 
-	def tick(self, alpha, inner, outer, width = None, color = None, **args):
+	def tick(self, alpha, inner, outer, width = None, color = Global.attributes['color'], **args):
 		self._map_args(args, stroke_width = width, stroke = color)
-		if color == None:
-			args['stroke'] = Global.attributes['color']   ## FIXME
 
 		if self.x != 0 or self.y != 0:
 			self.translate(self.x, self.y)
