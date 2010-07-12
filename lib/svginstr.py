@@ -20,6 +20,28 @@ class Error(Exception):
 
 
 
+class Global:
+	transforms = {}
+	attributes = {
+		'color': 'white',
+		'fill': 'white',
+		'font_family': 'Helvetica',
+		'font_weight': 'normal',
+		'font_size': 11,
+	}
+
+
+
+def set_global_attributes(**args):
+	for key, value in args.items():
+		if value is None:
+			if key in Global.attributes:
+				del(Global.attributes[key])
+		else:
+			Global.attributes[key] = value
+
+
+
 class Matrix:
 	def __init__(self, a = 1, b = 0, c = 0, d = 1, e = 0, f = 0):
 		self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
@@ -276,28 +298,6 @@ class RadialGradient(Gradient):
 		return ["<radialGradient id=\"%s\" cx=\"%s\" cy=\"%s\" r=\"%s\" fx=\"%s\" fy=\"%s\">" \
 				% (self.name, self.cx, self.cy, self.r, self.fx, self.fy)] \
 				+ Gradient.code(self) + ["</radialGradient>"]
-
-
-
-class Global:
-	transforms = {}
-	attributes = {
-		'color': 'white',
-		'fill': 'white',
-		'font_family': 'Helvetica',
-		'font_weight': 'normal',
-		'font_size': 11,
-	}
-
-
-
-def set_global_attributes(**args):
-	for key, value in args.items():
-		if value is None:
-			if key in Global.attributes:
-				del(Global.attributes[key])
-		else:
-			Global.attributes[key] = value
 
 
 

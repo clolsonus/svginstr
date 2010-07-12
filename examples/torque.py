@@ -14,9 +14,9 @@ __doc__ = """
 try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
-	#-- face --
+	#-- face ------------------------------------------------------------------------
 
-	if a.region(-100, -100, 175, 175).begin(fill = "white"):
+	if a.region(-100, -100, 175, 175).begin():
 		#a.square(200, color = '#202020')
 		a.disc(100, color = '#202020')
 
@@ -62,7 +62,7 @@ try:
 	a.end()
 
 
-	#-- needle --
+	#-- needle ----------------------------------------------------------------------
 
 	if True:
 		if 0:
