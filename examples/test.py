@@ -38,7 +38,7 @@ try:
 
 	if a.rotate(0).begin():  # example for writing raw svg
 		a.write('<path d="M0,-94 A94,94 0 0,1 94,0" fill="none" stroke-width="4.5" stroke="yellow" opacity="0.8"/>')
-	a.end()
+		a.end()
 
 	a.arc(2, 8, 80, width = 10, color = "pink", opacity = 0.6)
 
@@ -50,7 +50,7 @@ try:
 	if a.scale(0.8).rotate(60).translate(-20, -50).begin():
 		triangle = Path().abs().moveto_polar(0, 20).lineto_polar(120, 20, -120, 20).close()
 		a.shape(triangle, fill = "white", stroke = "maroon", stroke_width = 5)
-	a.end()
+		a.end()
 
 except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e

@@ -42,7 +42,7 @@ try:
 				a.at(39, -46).text("80")
 				a.at(56, -8).text("100")
 				a.at(50, 38).text("120")
-			a.end()
+				a.end()
 
 			a.at(0, 55).text("%", font_size = 17)
 			a.at(0, 75).text("TORQUE", font_size = 20)
@@ -52,14 +52,14 @@ try:
 
 			a.disc(8, 'black')
 			a.disc(0.4, 'red')
-		a.end()
+			a.end()
 
 		bezelshadow = RadialGradient()
 		bezelshadow.stop("0%", 0, alpha = 0)
 		bezelshadow.stop("85%", 0, alpha = 0)
 		bezelshadow.stop("100%", 0, alpha = 0.4)
 		a.gradient(bezelshadow).square(200)
-	a.end()
+		a.end()
 
 
 	#-- needle ----------------------------------------------------------------------
@@ -95,7 +95,7 @@ try:
 		g.stop("90%", 20)
 		g.stop("100%", 5)
 		a.gradient(g).disc(9)
-	a.end()
+		a.end()
 
 
 	# generate animation XML file for FlightGear

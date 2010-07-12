@@ -29,7 +29,7 @@ try:
 					else:
 						a.at(-4, -89).text(sec / 10)
 				a.at(5.5, -89).text(sec % 10)
-			a.end()
+				a.end()
 
 		for min in range(4):
 			angle = 6 + 30 * hour + 6 * min
@@ -44,12 +44,12 @@ try:
 		a.at(37, 10).text("3")
 		a.at(-35, 10).text("9")
 		a.at(1, -45).text("I2")
-	a.end()
+		a.end()
 
 	if a.begin(font_size = 7):
 		a.at(0, -29).text("FLIGHTGEAR")
 		a.at(0, -21).text("CLOCK")
-	a.end()
+		a.end()
 
 	# subclock
 	if a.translate(0, 38).begin():
@@ -63,8 +63,8 @@ try:
 			a.at(1, -11).text("0")
 			a.at(13, 12).text("5")
 			a.at(-11, 12).text("I0")
+			a.end()
 		a.end()
-	a.end()
 
 except Error as e:
 	print >>sys.stderr, "\033[31;1m%s\033[m\n" % e

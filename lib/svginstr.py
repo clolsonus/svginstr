@@ -658,8 +658,8 @@ class Instrument:
 			self.gradient(head).disc(50)
 			if self.rotate(rotation).begin():
 				self.rectangle(100, 19, color = "#1a1a1a")
+				self.end()
 			self.end()
-		self.end()
 
 	def xml(self, name):
 		return _xml(self, name)
