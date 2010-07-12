@@ -312,7 +312,16 @@ class Instrument:
 		self.contents = []
 		self.unit = 0.01
 		self.matrix = None
-		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(200, -200).invert()] # FIXME rect
+
+		if w > h: # width/height in internal coords  (min(w, h) -> 200)
+			self.W, self.H = 200.0 * w / h, 200.0
+		else:
+			self.W, self.H = 200.0, 200.0 * h / w
+		print('internal coordinate system: x = [-%s, +%s]   y = [-%s, +%s]' \
+				% (R(self.W * 0.5), R(self.W * 0.5), R(self.H * 0.5), R(self.H * 0.5)))
+
+		# matrix that transforms from internal svginstr coords to UV coords
+		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(self.W, -self.H).invert()]
 
 		try:
 			if filename.endswith(".svgz") or filename.endswith(".svg.gz"):
@@ -327,15 +336,16 @@ class Instrument:
 			self._write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" '\
 					'xmlns="http://www.w3.org/2000/svg" '\
 					'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
-					% (R(self.w), R(self.h), 0, 0, 200, 200))
+					% (R(self.w), R(self.h), 0, 0, R(self.W), R(self.H)))
 			if desc:
 				self.description(desc) # FIXME
 
 			attributes = Global.attributes.copy()
 			attributes.update(args)
-			self.write('<g transform="translate(100, 100)"%s>' % self._args_string(attributes))
+			self.write('<g transform="translate(%s, %s)"%s>' \
+					% (R(self.W * 0.5), R(self.H * 0.5), self._args_string(attributes)))
 			self.write('<rect x="%s" y="%s" width="%s" height="%s" stroke="none" fill="none"/>' \
-					% (-100, -100, 200, 200))
+					% (R(self.W * -0.5), R(self.H * -0.5), R(self.W), R(self.H)))
 
 		except IOError as error:
 			raise Error("I/O error(%s): %s" % error)
