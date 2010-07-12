@@ -305,14 +305,15 @@ class Instrument:
 	def __init__(self, filename, w, h = None, desc = None, **args):
 		self.x = 0
 		self.y = 0
+		self.w = w
+		self.h = h or w
 		self.indent = 0
-		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(200, -200).invert()]
-		self.matrix = None
 		self.defs = []
 		self.trans = []
 		self.contents = []
-		self.reset()
 		self.unit = 0.01
+		self.matrix = None
+		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(200, -200).invert()] # FIXME rect
 
 		try:
 			if filename.endswith(".svgz") or filename.endswith(".svg.gz"):
@@ -327,15 +328,15 @@ class Instrument:
 			self._write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" '\
 					'xmlns="http://www.w3.org/2000/svg" '\
 					'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
-					% (R(w), R(h or w), 0, 0, 200, 200))
-
+					% (R(self.w), R(self.h), 0, 0, 200, 200))
 			if desc:
 				self.description(desc)
 
 			attributes = Global.attributes.copy()
 			attributes.update(args)
 			self.write('<g transform="translate(100, 100)"%s>' % self._args_string(attributes))
-			self.write('<rect x="-100" y="-100" width="200" height="200" stroke="none" fill="none"/>')
+			self.write('<rect x="%s" y="%s" width="%s" height="%s" stroke="none" fill="none"/>' \
+					% (-100, -100, 200, 200))
 
 		except IOError as error:
 			raise Error("I/O error(%s): %s" % error)
