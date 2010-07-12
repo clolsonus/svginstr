@@ -1,8 +1,15 @@
 svginstr is a set of classes that assist with the generation of instrument faces,
-which are written in the SVG (scalable vector graphics) format, and can then be
-converted to any other format, such as PNG (portable network graphics). The main
+which are written in the SVG (Scalable Vector Graphics) format, and can then be
+converted to any other format, such as PNG (Portable Network Graphics). The main
 advantage of this method is that image contents can be drawn algorithmically,
 which makes exact drawing of, for instance, scale ticks comparatively easy.
+
+svginstr doesn't only create SVG files, it's closely tied to SVG, so it isstrongly
+recommended to have the SVG documentation handy:
+
+  http://www.w3.org/TR/SVG11/index.html
+
+
 
 Several instruments can be defined in one Python driver file. Reusable gradients
 and paths can be defined first, followed by one or more Instrument() declaration
