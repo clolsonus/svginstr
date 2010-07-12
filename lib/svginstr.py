@@ -302,12 +302,14 @@ class RadialGradient(Gradient):
 
 
 class Instrument:
-	def __init__(self, filename, w, h = None, desc = None, **args):
+	def __init__(self, filename, w, h = None, title = None, **args):
+		self.indent = 0
 		self.x = 0
 		self.y = 0
 		self.w = w
 		self.h = h or w
-		self.indent = 0
+		self._title = title
+		self._desc = title
 		self.defs = []
 		self.trans = []
 		self.contents = []
@@ -338,8 +340,6 @@ class Instrument:
 					'xmlns="http://www.w3.org/2000/svg" '\
 					'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
 					% (R(self.w), R(self.h), 0, 0, R(self.W), R(self.H)))
-			if desc:
-				self.description(desc) # FIXME
 
 			attributes = Global.attributes.copy()
 			attributes.update(args)
@@ -356,6 +356,10 @@ class Instrument:
 
 	def __del__(self):
 		try:
+			if self._title:
+				self._write('<title>%s</title>' % self._title)
+			if self._desc:
+				self._write('<desc>%s</desc>' % self._desc)
 			if self.defs:
 				self._write('<defs>')
 				for d in self.defs:
@@ -400,10 +404,10 @@ class Instrument:
 		self.contents.append(s)
 
 	def title(self, s):
-		self.write('<title>%s</title>' % s)
+		self._title = s
 
 	def description(self, s):
-		self.write('<desc>%s</desc>' % s)
+		self._desc = s
 
 	def begin(self, name = None, **args):
 		if name:
