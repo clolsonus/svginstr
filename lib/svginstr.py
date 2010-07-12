@@ -424,8 +424,8 @@ class Instrument:
 		self.trans = []
 		self.matrix = Matrix()
 
-	def _attrib(self):
-		return self._style() + self._trans()
+	def _attrib(self, args):
+		return self._style() + self._trans() + self._args_string(args)
 
 	def _args_string(self, dic):
 		""" turn dictionary into joined string of ' key="value"' """
@@ -559,31 +559,31 @@ class Instrument:
 	def circle(self, radius, width, color = Global.attributes['color'], **args):
 		self._map_args(args, stroke = color)
 		self.write('<circle cx="%s" cy="%s" r="%s" fill="none" stroke-width="%s"%s/>' \
-				% (self.x, self.y, R(radius), R(width), self._attrib() + self._args_string(args)))
+				% (self.x, self.y, R(radius), R(width), self._attrib(args)))
 		self.reset()
 
 	def disc(self, radius, color = None, **args):
 		self._map_args(args, fill = color)
 		self.write('<circle cx="%s" cy="%s" r="%s"%s/>' \
-				% (self.x, self.y, R(radius), self._attrib() + self._args_string(args)))
+				% (self.x, self.y, R(radius), self._attrib(args)))
 		self.reset()
 
 	def square(self, width, color = None, **args):
 		self._map_args(args, fill = color)
 		self.write('<rect x="%s" y="%s" width="%s" height="%s"%s/>' \
 				% (self.x - 0.5 * width, self.y - 0.5 * width, R(width), R(width), \
-				self._attrib() + self._args_string(args)))
+				self._attrib(args)))
 		self.reset()
 
 	def rectangle(self, width, height, color = None, **args):
 		self._map_args(args, fill = color)
 		self.write('<rect x="%s" y="%s" width="%s" height="%s"%s/>' \
 				% (self.x - 0.5 * width, self.y - 0.5 * height, R(width), R(height), \
-				self._attrib() + self._args_string(args)))
+				self._attrib(args)))
 		self.reset()
 
 	def shape(self, path, **args):
-		self.write('<path d="%s"%s/>' % (str(path), self._args_string(args) + self._attrib()))
+		self.write('<path d="%s"%s/>' % (str(path), self._attrib(args)))
 		self.reset()
 
 	def text(self, text, size = None, color = None, **args):
@@ -607,7 +607,7 @@ class Instrument:
 		self.begin()
 		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" fill="none"%s/>' \
 				% (radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
-				self._attrib() + self._args_string(args)))
+				self._attrib(args)))
 		self.end()
 
 	def tick(self, alpha, inner, outer, width = None, color = Global.attributes['color'], **args):
@@ -616,7 +616,7 @@ class Instrument:
 		self.write('<line x1="%s" y1="%s" x2="%s" y2="%s"%s/>' \
 				% (self.x + inner * cosd(a), self.y + inner * sind(a), \
 				self.x + outer * cosd(a), self.y + outer * sind(a), \
-				self._attrib() + self._args_string(args)))
+				self._attrib(args)))
 		self.reset()
 
 	def arctext(self, startangle, radius, text, size = None, color = None, **args):
@@ -626,7 +626,7 @@ class Instrument:
 		self.write('<defs>')
 		self.write('<path id="arctext" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
 		self.write('</defs>')
-		self.write('<text%s>' % (self._attrib() + self._args_string(args)))
+		self.write('<text%s>' % (self._attrib(args)))
 		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
 		self.write('</text>')
 		self.write('</g>')
