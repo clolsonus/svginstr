@@ -472,7 +472,6 @@ class Instrument:
 			return ""
 
 	def style(self, s):
-		""" add one style """
 		self.styles.append(s)
 		return self
 
@@ -569,6 +568,13 @@ class Instrument:
 				% (self.x, self.y, R(radius), self._attrib() + self._args_string(args)))
 		self.reset()
 
+	def square(self, width, color = None, **args):
+		self._map_args(args, fill = color)
+		self.write('<rect x="%s" y="%s" width="%s" height="%s"%s/>' \
+				% (self.x - 0.5 * width, self.y - 0.5 * width, R(width), R(width), \
+				self._attrib() + self._args_string(args)))
+		self.reset()
+
 	def rectangle(self, width, height, color = None, **args):
 		self._map_args(args, fill = color)
 		self.write('<rect x="%s" y="%s" width="%s" height="%s"%s/>' \
@@ -576,11 +582,8 @@ class Instrument:
 				self._attrib() + self._args_string(args)))
 		self.reset()
 
-	def square(self, width, color = None, **args):
-		self._map_args(args, fill = color)
-		self.write('<rect x="%s" y="%s" width="%s" height="%s"%s/>' \
-				% (self.x - 0.5 * width, self.y - 0.5 * width, R(width), R(width), \
-				self._attrib() + self._args_string(args)))
+	def shape(self, path, **args):
+		self.write('<path d="%s"%s/>' % (str(path), self._args_string(args) + self._attrib()))
 		self.reset()
 
 	def text(self, text, size = None, color = None, **args):
@@ -612,19 +615,11 @@ class Instrument:
 
 		if self.x != 0 or self.y != 0:
 			self.translate(self.x, self.y)
-		self.rotate(R(self.angle(alpha)))
-		self.begin()
+
+		self.rotate(R(self.angle(alpha))).begin()
 		self.write('<line x1="%s" x2="%s"%s/>' %\
 				(R(inner), R(outer), self._attrib() + self._args_string(args)))
 		self.end()
-
-	def chequer(self, size = 10, color = "lightgrey"):
-		for y in range(20):
-			for x in range(20):
-				if (x + y) & 1:
-					continue
-				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' \
-						% (R(size * x - 100), R(size * y - 100), R(size), R(size), color))
 
 	def arctext(self, startangle, radius, text, size = None, color = None, **args):
 		self._map_args(args, font_size = size, fill = color)
@@ -638,9 +633,13 @@ class Instrument:
 		self.write('</text>')
 		self.write('</g>')
 
-	def shape(self, path, **args):
-		self.write('<path d="%s"%s/>' % (str(path), self._args_string(args) + self._attrib()))
-		self.reset()
+	def chequer(self, size = 10, color = "lightgrey"):
+		for y in range(20):
+			for x in range(20):
+				if (x + y) & 1:
+					continue
+				self.write('<rect x="%s" y="%s" width="%s" height="%s" fill="%s"/>' \
+						% (R(size * x - 100), R(size * y - 100), R(size), R(size), color))
 
 	def screw(self, scale, rotation = None):
 		if rotation == None:
