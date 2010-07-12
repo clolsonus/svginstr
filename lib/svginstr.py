@@ -22,11 +22,10 @@ class Error(Exception):
 
 class Global:
 	transforms = {}
-	attributes = {
+	attributes = {  # use underscore instead of hyphen!
 		'color': 'white',
 		'fill': 'white',
 		'font_family': 'Helvetica',
-		'font_weight': 'normal',
 		'font_size': 11,
 	}
 
@@ -330,7 +329,7 @@ class Instrument:
 					'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
 					% (R(self.w), R(self.h), 0, 0, 200, 200))
 			if desc:
-				self.description(desc)
+				self.description(desc) # FIXME
 
 			attributes = Global.attributes.copy()
 			attributes.update(args)
@@ -340,6 +339,9 @@ class Instrument:
 
 		except IOError as error:
 			raise Error("I/O error(%s): %s" % error)
+
+		self.reset()
+
 
 	def __del__(self):
 		try:
@@ -600,15 +602,14 @@ class Instrument:
 		end = self.angle(end)
 		b = min(begin, end)
 		e = max(begin, end) - b
-		if radius == 0:
-			radius = 10e-10
+		r = radius or 10e-10
 
 		self.rotate(R(b))
 		if self.x != 0 or self.y != 0:
 			self.translate(self.x, self.y)
 		self.begin()
-		self.write('<path d="M%s,%s A%s,%s %s %s,1 %s,%s" fill="none"%s/>' \
-				% (radius, 0, radius, radius, e / 2, [0, 1][e >= 180], R(radius * cosd(e)), R(radius * sind(e)),
+		self.write('<path d="M%s,0 A%s,%s %s %d,1 %s,%s" fill="none"%s/>' \
+				% (r, r, r, e / 2, (e >= 180), R(r * cosd(e)), R(r * sind(e)),
 				self._attrib(args)))
 		self.end()
 		self.reset()

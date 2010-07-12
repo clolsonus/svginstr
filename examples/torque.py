@@ -14,6 +14,7 @@ __doc__ = """
 try:
 	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
 
+
 	#-- face ------------------------------------------------------------------------
 
 	if a.region(-100, -100, 175, 175).begin():
@@ -50,8 +51,8 @@ try:
 			a.at(0, -30).screw(0.12, 30)
 			a.at(0, 30).screw(0.12, 70)
 
-			a.disc(8, 'black')
-			a.disc(0.4, 'red')
+			a.disc(8, color = 'black')
+			a.disc(0.4, color = 'red')
 			a.end()
 
 		bezelshadow = RadialGradient()
