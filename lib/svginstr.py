@@ -653,7 +653,7 @@ class Instrument:
 		self.reset()
 
 	def arctext(self, startangle, radius, text, size = None, color = None, **args):
-		self._map_args(args, font_size = size, fill = color)
+		self._map_args(args, font_size = size, fill = color, text_anchor = 'start')
 		r = R(radius)
 		self.write('<g transform="rotate(%s)">' % startangle)
 		self.write('<defs>')
