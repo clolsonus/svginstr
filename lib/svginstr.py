@@ -58,13 +58,13 @@ class Matrix:
 	def transform(self, u, v):
 		return u * self.a + v * self.c + self.e, u * self.b + v * self.d + self.f
 
-	def multiply(self, mat):
-		a = mat.a * self.a + mat.c * self.b
-		b = mat.b * self.a + mat.d * self.b
-		c = mat.a * self.c + mat.c * self.d
-		d = mat.b * self.c + mat.d * self.d
-		e = mat.a * self.e + mat.c * self.f + mat.e
-		f = mat.b * self.e + mat.d * self.f + mat.f
+	def multiply(self, m):
+		a = m.a * self.a + m.c * self.b
+		b = m.b * self.a + m.d * self.b
+		c = m.a * self.c + m.c * self.d
+		d = m.b * self.c + m.d * self.d
+		e = m.a * self.e + m.c * self.f + m.e
+		f = m.b * self.e + m.d * self.f + m.f
 		self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
 		return self
 
