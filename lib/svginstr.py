@@ -323,8 +323,10 @@ class Instrument:
 			self.W, self.H = 200.0 * w / h, 200.0
 		else:
 			self.W, self.H = 200.0, 200.0 * h / w
-		print('internal coordinate system: x = [-%s, +%s],  y = [-%s, +%s]' \
-				% (R(self.W * 0.5), R(self.W * 0.5), R(self.H * 0.5), R(self.H * 0.5)))
+
+		if w != h:
+			print('internal coordinate system: x = [-%s, +%s],  y = [-%s, +%s]' \
+					% (R(self.W * 0.5), R(self.W * 0.5), R(self.H * 0.5), R(self.H * 0.5)))
 
 		# matrix that transforms from internal svginstr coords to UV coords
 		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(self.W, -self.H).invert()]
