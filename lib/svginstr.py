@@ -52,6 +52,9 @@ class Matrix:
 	def __cmp__(self, m):
 		return cmp((self.a, self.b, self.c, self.d, self.e, self.f), (m.a, m.b, m.c, m.d, m.e, m.f))
 
+	def __nonzero__(self):
+		return (self.a, self.b, self.c, self.d, self.e, self.f) != (1, 0, 0, 1, 0, 0)
+
 	def copy(self):
 		return Matrix(self.a, self.b, self.c, self.d, self.e, self.f)
 
