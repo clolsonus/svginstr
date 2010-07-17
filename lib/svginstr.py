@@ -3,7 +3,7 @@
 import sys
 import gzip
 import string
-from math import ceil, sin, cos, pi, sqrt
+from math import ceil, sin, cos, tan, pi, sqrt
 from random import random
 
 __author__ = "Melchior FRANZ < mfranz # aon : at >"
