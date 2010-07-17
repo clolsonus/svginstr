@@ -767,9 +767,9 @@ def cosd(a):
 
 
 
-def position(a, b, n):
-	" from angle, to angle, number "
-	return [a + x * (float(b) - a) / n for x in range(n)] + [b]
+def position(begin, end, n):
+	# return list of n evenly spaced steps from begin to end (n+1 positions)
+	return [begin + i * (float(end) - begin) / n for i in range(n)] + [end]
 
 
 
