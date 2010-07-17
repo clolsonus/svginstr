@@ -49,6 +49,9 @@ class Matrix:
 	def __str__(self):
 		return "[Matrix %f %f %f %f %f %f]" % (self.a, self.b, self.c, self.d, self.e, self.f)
 
+	def __cmp__(self, m):
+		return cmp([self.a, self.b, self.c, self.d, self.e, self.f], [m.a, m.b, m.c, m.d, m.e, m.f])
+
 	def copy(self):
 		return Matrix(self.a, self.b, self.c, self.d, self.e, self.f)
 
