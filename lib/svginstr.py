@@ -309,8 +309,48 @@ class RadialGradient(Gradient):
 
 
 
+class FGPanel:
+	def __init__(self, name, w, h):
+		self.data = []
+		self.name = name
+		self.W = w
+		self.H = h
+
+	def add(self, name, matrix, x, y, w, h):
+		self.data.append((name or "NoName", matrix, x, y, w, h))
+
+	def __del__(self):
+		t = Global.indent
+		print(0 * t + '<?xml version="1.0"?>\n')
+		print(0 * t + '<PropertyList>')
+		print(1 * t + '<name>%s</name>' % self.name)
+		print(1 * t + '<w-base>%s</w-base>' % self.W)
+		print(1 * t + '<h-base>%s</h-base>\n' % self.W)
+		print(1 * t + '<layers>')
+		for i in self.data:
+			name, matrix, x, y, w, h = i
+			p1 = matrix.transform(x, y + h)
+			p2 = matrix.transform(x + w, y)
+			s = matrix.transform(w - 100, 100 - h)
+			print(2 * t + '<name>%s</name>' % name)
+			print(2 * t + '<layer>')
+			print(3 * t + '<w>%s</w>' % R(self.W * s[0]))
+			print(3 * t + '<h>%s</h>' % R(self.H * s[1]))
+			print(3 * t + '<texture>')
+			print(4 * t + '<x1>%s</x1>' % R(p1[0]))
+			print(4 * t + '<y1>%s</y1>' % R(p1[1]))
+			print(4 * t + '<x2>%s</x2>' % R(p2[0]))
+			print(4 * t + '<y2>%s</y2>' % R(p2[1]))
+			print(3 * t + '</texture>')
+			print(2 * t + '</layer>')
+		print(1 * t + '</layers>')
+		print(0 * t + '</PropertyList>')
+
+
+
 class Instrument:
 	def __init__(self, filename, w, h = None, title = None, **args):
+		self.basename = string.split(filename, '.')[0]
 		self.indent = 0
 		self.x = 0
 		self.y = 0
@@ -323,9 +363,6 @@ class Instrument:
 		self.contents = []
 		self.unit = 0.01
 		self.matrix = None
-
-		self.target_w = self.w  # needed for dump_uv_coords()
-		self.target_h = self.h
 
 		if w > h: # width/height in internal coords  (min(w, h) -> 200)
 			self.W, self.H = 200.0 * w / h, 200.0
@@ -423,7 +460,7 @@ class Instrument:
 		self._desc = s
 
 	def fg_size(self, w, h):
-		self.target_w, self.target_h = w, h
+		self.fgpanel = FGPanel(self.basename, w, h)
 		return self
 
 	def begin(self, name = None, **args):
@@ -588,7 +625,7 @@ class Instrument:
 
 	def region(self, x, y, w, h, clip = 1, name = None):
 		uv_matrix = self.matrix.copy().multiply(self.matrix_stack[-1])
-		dump_uv_coords(name, uv_matrix, x, y, w, h, self.target_w, self.target_h)
+		self.fgpanel.add(name, uv_matrix, x, y, w, h)
 		W = max(w, h)
 		return self.scale(W / 200.0).translate(x + w * 0.5, y + h * 0.5)
 
@@ -759,28 +796,6 @@ class _xml:
 		self.write('\t\t\t<z>0</z>\n')
 		self.write('\t\t</axis>\n')
 		self.write('\t</animation>\n')
-
-
-
-def dump_uv_coords(name, matrix, x, y, w, h, W, H):
-	if not name:
-		return
-	p1 = matrix.transform(x, y + h)
-	p2 = matrix.transform(x + w, y)
-	s = matrix.transform(w - 100, 100 - h)
-	i = Global.indent
-	print(0 * i + '<!-- %s -->' % name)
-	print(0 * i + '<layer>')
-	print(1 * i + '<w>%s</w>' % R(W * s[0]))
-	print(1 * i + '<h>%s</h>' % R(H * s[1]))
-	print(1 * i + '<texture>')
-	print(2 * i + '<x1>%s</x1>' % R(p1[0]))
-	print(2 * i + '<y1>%s</y1>' % R(p1[1]))
-	print(2 * i + '<x2>%s</x2>' % R(p2[0]))
-	print(2 * i + '<y2>%s</y2>' % R(p2[1]))
-	print(1 * i + '</texture>')
-	print(0 * i + '</layer>')
-	print('')
 
 
 
