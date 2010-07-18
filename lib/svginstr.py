@@ -760,7 +760,7 @@ class _xml:
 			self.file = open(filename + ".xml", "w")
 			self.write('<?xml version="1.0"?>\n\n')
 			self.write('<PropertyList>\n')
-			self.write('\t<path>%s.ac</path>\n' % filename)
+			self.write(Global.indent + '<path>%s.ac</path>\n' % filename)
 
 		except IOError as error:
 			raise Error("I/O error(%s): %s" % error)
@@ -781,21 +781,22 @@ class _xml:
 			raise Error("I/O error(%s): %s" % error)
 
 	def animation(self, objname, prop, points):
-		self.write('\t<animation>\n')
-		self.write('\t\t<type>rotate</type>\n')
-		self.write('\t\t<object-name>%s</object-name>\n' % objname)
-		self.write('\t\t<property>%s</property>\n' % prop)
-		self.write('\t\t<interpolation>\n')
+		t = Global.indent
+		self.write(1 * t + '<animation>\n')
+		self.write(2 * t + '<type>rotate</type>\n')
+		self.write(2 * t + '<object-name>%s</object-name>\n' % objname)
+		self.write(2 * t + '<property>%s</property>\n' % prop)
+		self.write(2 * t + '<interpolation>\n')
 		for p in points:
-			self.write('\t\t\t<entry><ind>%s</ind><dep>%s</dep></entry>\n' \
+			self.write(3 * t + '<entry><ind>%s</ind><dep>%s</dep></entry>\n' \
 				% (R(p), R(self.instrument.angle(p))))
-		self.write('\t\t</interpolation>\n')
-		self.write('\t\t<axis>\n')
-		self.write('\t\t\t<x>-1</x>\n')
-		self.write('\t\t\t<y>0</y>\n')
-		self.write('\t\t\t<z>0</z>\n')
-		self.write('\t\t</axis>\n')
-		self.write('\t</animation>\n')
+		self.write(2 * t + '</interpolation>\n')
+		self.write(2 * t + '<axis>\n')
+		self.write(3 * t + '<x>-1</x>\n')
+		self.write(3 * t + '<y>0</y>\n')
+		self.write(3 * t + '<z>0</z>\n')
+		self.write(2 * t + '</axis>\n')
+		self.write(1 * t + '</animation>\n')
 
 
 
