@@ -21,6 +21,7 @@ class Error(Exception):
 
 
 class Global:
+	indent = '\t'
 	transforms = {}
 	attributes = {  # use underscore instead of hyphen!
 		'color': 'white',
@@ -322,6 +323,9 @@ class Instrument:
 		self.unit = 0.01
 		self.matrix = None
 
+		self.target_w = self.w  # needed for dump_uv_coords()
+		self.target_h = self.h
+
 		if w > h: # width/height in internal coords  (min(w, h) -> 200)
 			self.W, self.H = 200.0 * w / h, 200.0
 		else:
@@ -416,6 +420,9 @@ class Instrument:
 
 	def description(self, s):
 		self._desc = s
+
+	def fg_instr_size(self, w, h):
+		self.target_w, self.target_h = w, h
 
 	def begin(self, name = None, **args):
 		if name:
@@ -577,8 +584,10 @@ class Instrument:
 		self.matrix.multiply(Matrix(a, b, c, d, e, f))
 		return self
 
-	def region(self, x, y, w, h, clip = 1):
-		W = max(w, h)       # scale and translate applied in reverse order:
+	def region(self, x, y, w, h, clip = 1, name = None):
+		uv_matrix = self.matrix.copy().multiply(self.matrix_stack[-1])
+		dump_uv_coords(name, uv_matrix, x, y, w, h, self.target_w, self.target_h)
+		W = max(w, h)
 		return self.scale(W / 200.0).translate(x + w * 0.5, y + h * 0.5)
 
 
@@ -748,6 +757,28 @@ class _xml:
 		self.write('\t\t\t<z>0</z>\n')
 		self.write('\t\t</axis>\n')
 		self.write('\t</animation>\n')
+
+
+
+def dump_uv_coords(name, matrix, x, y, w, h, W, H):
+	if not name:
+		return
+	p1 = matrix.transform(x, y)
+	p2 = matrix.transform(x + w, y + h)
+	s = matrix.transform(w - 100, 100 - h)
+	i = Global.indent
+	print(0 * i + '<!-- %s -->' % name)
+	print(0 * i + '<layer>')
+	print(1 * i + '<w>%s</w>' % R(W * s[0]))
+	print(1 * i + '<h>%s</h>' % R(H * s[1]))
+	print(1 * i + '<texture>')
+	print(2 * i + '<x1>%s</x1>' % R(p1[0]))
+	print(2 * i + '<y1>%s</y1>' % R(p2[1]))
+	print(2 * i + '<x2>%s</x2>' % R(p2[0]))
+	print(2 * i + '<y2>%s</y2>' % R(p1[1]))
+	print(1 * i + '</texture>')
+	print(0 * i + '</layer>')
+	print('')
 
 
 
