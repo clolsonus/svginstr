@@ -440,7 +440,7 @@ class Instrument:
 
 		self.matrix_stack.append(self.matrix.multiply(self.matrix_stack[-1]))
 
-		x, y = self.matrix_stack[-1].copy().invert().transform(0, 1)
+		x, y = self.matrix_stack[-1].copy().invert().transform(0, 1) # FIXME square
 		self.unit = 0.01 * sqrt(x * x + y * y)
 
 		self.reset()
@@ -765,8 +765,8 @@ class _xml:
 def dump_uv_coords(name, matrix, x, y, w, h, W, H):
 	if not name:
 		return
-	p1 = matrix.transform(x, y)
-	p2 = matrix.transform(x + w, y + h)
+	p1 = matrix.transform(x, y + h)
+	p2 = matrix.transform(x + w, y)
 	s = matrix.transform(w - 100, 100 - h)
 	i = Global.indent
 	print(0 * i + '<!-- %s -->' % name)
@@ -775,9 +775,9 @@ def dump_uv_coords(name, matrix, x, y, w, h, W, H):
 	print(1 * i + '<h>%s</h>' % R(H * s[1]))
 	print(1 * i + '<texture>')
 	print(2 * i + '<x1>%s</x1>' % R(p1[0]))
-	print(2 * i + '<y1>%s</y1>' % R(p2[1]))
+	print(2 * i + '<y1>%s</y1>' % R(p1[1]))
 	print(2 * i + '<x2>%s</x2>' % R(p2[0]))
-	print(2 * i + '<y2>%s</y2>' % R(p1[1]))
+	print(2 * i + '<y2>%s</y2>' % R(p2[1]))
 	print(1 * i + '</texture>')
 	print(0 * i + '</layer>')
 	print('')
