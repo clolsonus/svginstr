@@ -51,7 +51,8 @@ class Matrix:
 		return "[Matrix %f %f %f %f %f %f]" % (self.a, self.b, self.c, self.d, self.e, self.f)
 
 	def __cmp__(self, m):
-		return cmp((self.a, self.b, self.c, self.d, self.e, self.f), (m.a, m.b, m.c, m.d, m.e, m.f))
+		return cmp((self.a, self.b, self.c, self.d, self.e, self.f), \
+				(m.a, m.b, m.c, m.d, m.e, m.f))
 
 	def __nonzero__(self):
 		return (self.a, self.b, self.c, self.d, self.e, self.f) != (1, 0, 0, 1, 0, 0)
@@ -668,7 +669,7 @@ class Instrument:
 		self.write('<defs>')
 		self.write('<path id="arctext" d="M0,-%s A%s,%s 0 0,1 0,%s"/>' % (r, r, r, r))
 		self.write('</defs>')
-		self.write('<text%s>' % (self._attrib(args)))
+		self.write('<text%s>' % self._attrib(args))
 		self.write('<textPath xlink:href="#arctext">%s</textPath>' % text)
 		self.write('</text>')
 		self.write('</g>')
