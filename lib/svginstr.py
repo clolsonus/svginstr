@@ -43,6 +43,52 @@ def set_global_attributes(**args):
 
 
 
+class XML:
+	def __init__(self, filename, indent = '\t', compress = False):
+		self.indent = indent
+		self.level = 0
+		self.file = None
+		try:
+			if compress:
+				self.file = gzip.GzipFile(filename, "w")
+			else:
+				self.file = open(filename, "w")
+		except IOError as error:
+			raise Error("Error: XML.__init__(): " + str(error))
+
+	def __del__(self):
+		try:
+			if self.file:
+				self.file.close()
+		except IOError as error:
+			raise Error("Error: XML.__del__(): " + str(error))
+
+	def write(self, s = ''):
+		try:
+			s = s.strip()
+			if not s:
+				self.file.write('\n')
+				return
+
+			if s.startswith('<?') or s.startswith('<!'):
+				self.file.write(s + '\n')
+				return
+
+			if s.startswith('</'):
+				self.level -= 1
+
+			self.file.write(self.level * self.indent + s + '\n')
+
+			if s.startswith('<'):
+				if s.find('</') > 0:
+					return
+				if not s.startswith('</') and not s.endswith('/>'):
+					self.level += 1
+		except IOError as error:
+			raise Error("Error: XML.write(): " + str(error))
+
+
+
 class Matrix:
 	def __init__(self, a = 1, b = 0, c = 0, d = 1, e = 0, f = 0):
 		self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
@@ -309,47 +355,6 @@ class RadialGradient(Gradient):
 
 
 
-class FGPanel:
-	def __init__(self, name, w, h):
-		self.data = []
-		self.name = name
-		self.W = w
-		self.H = h
-
-	def add(self, name, matrix, x, y, w, h):
-		self.data.append((name or "NoName", matrix, x, y, w, h))
-
-	def __del__(self):
-		t = Global.indent
-		f = open(self.name + "-panel" + ".xml", "w")
-		f.write(0 * t + '<?xml version="1.0"?>\n\n')
-		f.write(0 * t + '<PropertyList>\n')
-		f.write(1 * t + '<name>%s</name>\n' % self.name)
-		f.write(1 * t + '<w-base>%s</w-base>\n' % self.W)
-		f.write(1 * t + '<h-base>%s</h-base>\n\n' % self.W)
-		f.write(1 * t + '<layers>\n')
-		for i in self.data:
-			name, matrix, x, y, w, h = i
-			p1 = matrix.transform(x, y + h)
-			p2 = matrix.transform(x + w, y)
-			s = matrix.transform(w - 100, 100 - h)
-			f.write(2 * t + '<name>%s</name>\n' % name)
-			f.write(2 * t + '<layer>\n')
-			f.write(3 * t + '<w>%s</w>\n' % R(self.W * s[0]))
-			f.write(3 * t + '<h>%s</h>\n' % R(self.H * s[1]))
-			f.write(3 * t + '<texture>\n')
-			f.write(4 * t + '<x1>%s</x1>\n' % R(p1[0]))
-			f.write(4 * t + '<y1>%s</y1>\n' % R(p1[1]))
-			f.write(4 * t + '<x2>%s</x2>\n' % R(p2[0]))
-			f.write(4 * t + '<y2>%s</y2>\n' % R(p2[1]))
-			f.write(3 * t + '</texture>\n')
-			f.write(2 * t + '</layer>\n')
-		f.write(1 * t + '</layers>\n')
-		f.write(0 * t + '</PropertyList>\n')
-		f.close()
-
-
-
 class Instrument:
 	def __init__(self, filename, w, h = None, title = None, **args):
 		self.basename = string.split(filename, '.')[0]
@@ -378,77 +383,46 @@ class Instrument:
 		# matrix that transforms from internal svginstr coords to UV coords
 		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(self.W, -self.H).invert()]
 
-		try:
-			if filename.endswith(".svgz") or filename.endswith(".svg.gz"):
-				self.file = gzip.GzipFile(filename, "w")
-			else:
-				self.file = open(filename, "w")
+		self.file = None
+		self.file = XML(filename, Global.indent, filename.endswith(".svgz") or \
+				filename.endswith(".svg.gz"))
+		self.file.write('<?xml version="1.0" standalone="no"?>')
+		self.file.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '\
+				'"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
+		self.file.write()
+		self.file.write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" '\
+				'xmlns="http://www.w3.org/2000/svg" '\
+				'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
+				% (R(self.w), R(self.h), 0, 0, R(self.W), R(self.H)))
 
-			self._write('<?xml version="1.0" standalone="no"?>')
-			self._write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '\
-					'"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
-			self._write()
-			self._write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" '\
-					'xmlns="http://www.w3.org/2000/svg" '\
-					'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
-					% (R(self.w), R(self.h), 0, 0, R(self.W), R(self.H)))
-
-			attributes = Global.attributes.copy()
-			attributes.update(args)
-			self.write('<g transform="translate(%s, %s)"%s>' \
-					% (R(self.W * 0.5), R(self.H * 0.5), self._args_string(attributes)))
-			self.write('<rect x="%s" y="%s" width="%s" height="%s" stroke="none" fill="none"/>' \
-					% (R(self.W * -0.5), R(self.H * -0.5), R(self.W), R(self.H)))
-
-		except IOError as error:
-			raise Error("I/O error(%s): %s" % error)
-
+		attributes = Global.attributes.copy()
+		attributes.update(args)
+		self.write('<g transform="translate(%s, %s)"%s>' \
+				% (R(self.W * 0.5), R(self.H * 0.5), self._args_string(attributes)))
+		self.write('<rect x="%s" y="%s" width="%s" height="%s" stroke="none" fill="none"/>' \
+				% (R(self.W * -0.5), R(self.H * -0.5), R(self.W), R(self.H)))
 		self.reset()
 
 
 	def __del__(self):
-		try:
+		if self.file:
 			if self._title:
-				self._write('<title>%s</title>' % self._title)
+				self.file.write('<title>%s</title>' % self._title)
 			if self._desc:
-				self._write('<desc>%s</desc>' % self._desc)
+				self.file.write('<desc>%s</desc>' % self._desc)
 			if self.defs:
-				self._write('<defs>')
+				self.file.write('<defs>')
 				for d in self.defs:
 					for i in d.code():
-						self._write(i)
-				self._write('</defs>')
+						self.file.write(i)
+				self.file.write('</defs>')
 
 			for i in self.contents:
-				self._write(i)
+				self.file.write(i)
 
-			self._write('</g>')
-			self._write('</svg>\n')
-			self.file.close()
-
-		except IOError as error:
-			raise Error("I/O error(%s): %s" % error)
-
-	def _write(self, s = ""):
-		# For internal purposes only. Don't use from outside!
-		try:
-			s = s.strip()
-			if s.startswith('<?') or s.startswith('<!'):
-				self.file.write(s + '\n')
-				return
-
-			if s.startswith('</'):
-				self.indent -= 1
-
-			self.file.write(self.indent * '\t' + s + '\n')
-
-			if s.startswith('<') and s.find('</') > 0:
-				pass
-			elif s.startswith('<') and not s.startswith('</') and not s.endswith('/>'):
-				self.indent += 1
-
-		except IOError as error:
-			raise Error("I/O error(%s): %s" % error)
+			self.file.write('</g>')
+			self.file.write('</svg>\n')
+			del self.file
 
 
 	# general methods
@@ -751,54 +725,80 @@ class Instrument:
 
 
 
-class _xml:
+class _xml(XML):
 	def __init__(self, parent, filename):
 		if not isinstance(parent, Instrument):
 			self.instrument = None
 			raise ValueError("_xml is only available as method of instrument")
 		self.instrument = parent
 
-		try:
-			self.file = open(filename + ".xml", "w")
-			self.write('<?xml version="1.0"?>\n\n')
-			self.write('<PropertyList>\n')
-			self.write(Global.indent + '<path>%s.ac</path>\n' % filename)
-
-		except IOError as error:
-			raise Error("I/O error(%s): %s" % error)
+		XML.__init__(self, filename + ".xml", Global.indent)
+		self.write('<?xml version="1.0"?>')
+		self.write()
+		self.write('<PropertyList>')
+		self.write('<path>%s.ac</path>' % filename)
 
 	def __del__(self):
-		try:
-			self.write("</PropertyList>\n")
-			self.file.close()
-
-		except IOError as error:
-			raise Error("I/O error(%s): %s" % error)
-
-	def write(self, s):
-		try:
-			self.file.write(s)
-
-		except IOError as error:
-			raise Error("I/O error(%s): %s" % error)
+		self.write("</PropertyList>")
+		XML.__del__(self)
 
 	def animation(self, objname, prop, points):
-		t = Global.indent
-		self.write(1 * t + '<animation>\n')
-		self.write(2 * t + '<type>rotate</type>\n')
-		self.write(2 * t + '<object-name>%s</object-name>\n' % objname)
-		self.write(2 * t + '<property>%s</property>\n' % prop)
-		self.write(2 * t + '<interpolation>\n')
+		self.write('<animation>')
+		self.write('<type>rotate</type>')
+		self.write('<object-name>%s</object-name>' % objname)
+		self.write('<property>%s</property>' % prop)
+		self.write('<interpolation>')
 		for p in points:
-			self.write(3 * t + '<entry><ind>%s</ind><dep>%s</dep></entry>\n' \
+			self.write('<entry><ind>%s</ind><dep>%s</dep></entry>' \
 				% (R(p), R(self.instrument.angle(p))))
-		self.write(2 * t + '</interpolation>\n')
-		self.write(2 * t + '<axis>\n')
-		self.write(3 * t + '<x>-1</x>\n')
-		self.write(3 * t + '<y>0</y>\n')
-		self.write(3 * t + '<z>0</z>\n')
-		self.write(2 * t + '</axis>\n')
-		self.write(1 * t + '</animation>\n')
+		self.write('</interpolation>')
+		self.write('<axis>')
+		self.write('<x>-1</x>')
+		self.write('<y>0</y>')
+		self.write('<z>0</z>')
+		self.write('</axis>')
+		self.write('</animation>')
+
+
+
+class FGPanel:
+	def __init__(self, name, w, h):
+		self.data = []
+		self.name = name
+		self.W = w
+		self.H = h
+
+	def add(self, name, matrix, x, y, w, h):
+		self.data.append((name or "NoName", matrix, x, y, w, h))
+
+	def __del__(self):
+		f = XML(self.name + "-panel.xml", Global.indent)
+		f.write('<?xml version="1.0"?>')
+		f.write()
+		f.write('<PropertyList>')
+		f.write('<name>%s</name>' % self.name)
+		f.write('<w-base>%s</w-base>' % self.W)
+		f.write('<h-base>%s</h-base>' % self.W)
+		f.write()
+		f.write('<layers>')
+		for i in self.data:
+			name, matrix, x, y, w, h = i
+			p1 = matrix.transform(x, y + h)
+			p2 = matrix.transform(x + w, y)
+			s = matrix.transform(w - 100, 100 - h)
+			f.write('<name>%s</name>' % name)
+			f.write('<layer>')
+			f.write('<w>%s</w>' % R(self.W * s[0]))
+			f.write('<h>%s</h>' % R(self.H * s[1]))
+			f.write('<texture>')
+			f.write('<x1>%s</x1>' % R(p1[0]))
+			f.write('<y1>%s</y1>' % R(p1[1]))
+			f.write('<x2>%s</x2>' % R(p2[0]))
+			f.write('<y2>%s</y2>' % R(p2[1]))
+			f.write('</texture>')
+			f.write('</layer>')
+		f.write('</layers>')
+		f.write('</PropertyList>')
 
 
 
