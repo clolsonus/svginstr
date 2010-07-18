@@ -422,7 +422,7 @@ class Instrument:
 	def description(self, s):
 		self._desc = s
 
-	def fg_instr_size(self, w, h):
+	def fg_instrument_size(self, w, h):
 		self.target_w, self.target_h = w, h
 
 	def begin(self, name = None, **args):
