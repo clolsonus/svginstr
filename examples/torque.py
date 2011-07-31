@@ -11,19 +11,20 @@ __doc__ = """
 """
 
 
-try:
-	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__)
+Global.indent = '\t'
 
+
+try:
+	a = Instrument("torque.svg", 512, 512, "Bo105 torquemeter; " + __version__).fg_size(384, 384)
+	a.angle = lambda x: 230.0 * (x - 60) / 120 - 90
 
 	#-- face ------------------------------------------------------------------------
 
-	if a.region(-100, -100, 175, 175).begin():
+	if a.region(-100, -100, 175, 175, name = "TEST").begin():
 		#a.square(200, color = '#202020')
 		a.disc(100, color = '#202020')
 
 		if a.scale(0.92).begin():
-			a.angle = lambda x: 230.0 * (x - 60) / 120 - 90
-
 			for i in range(0, 120, 2):
 				a.tick(i, 82, 99, 1)
 
@@ -61,7 +62,6 @@ try:
 		bezelshadow.stop("100%", 0, alpha = 0.4)
 		a.gradient(bezelshadow).square(200)
 		a.end()
-
 
 	#-- needle ----------------------------------------------------------------------
 
