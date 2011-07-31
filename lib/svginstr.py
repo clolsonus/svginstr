@@ -53,6 +53,7 @@ class XML:
 				self.file = gzip.GzipFile(filename, "w")
 			else:
 				self.file = open(filename, "w")
+
 		except IOError as error:
 			raise Error("Error: XML.__init__(): " + str(error))
 
@@ -60,6 +61,7 @@ class XML:
 		try:
 			if self.file:
 				self.file.close()
+
 		except IOError as error:
 			raise Error("Error: XML.__del__(): " + str(error))
 
@@ -84,6 +86,7 @@ class XML:
 					return
 				if not s.startswith('</') and not s.endswith('/>'):
 					self.level += 1
+
 		except IOError as error:
 			raise Error("Error: XML.write(): " + str(error))
 
