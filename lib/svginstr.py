@@ -359,7 +359,7 @@ class RadialGradient(Gradient):
 
 
 class Instrument:
-	def __init__(self, filename, w, h = None, title = None, **args):
+	def __init__(self, filename, w, h = None, title = None, units = "px", **args):
 		self.basename = string.split(filename, '.')[0]
 		self.indent = 0
 		self.x = 0
@@ -372,19 +372,26 @@ class Instrument:
 		self.trans = []
 		self.contents = []
 		self.unit = 0.01
+		self.units = units
 		self.matrix = None
 
-		if w > h: # width/height in internal coords  (min(w, h) -> 200)
-			self.W, self.H = 200.0 * w / h, 200.0
-		else:
-			self.W, self.H = 200.0, 200.0 * h / w
+		print self.units
 
-		if w != h:
-			print('internal coordinate system: x = [-%s, +%s],  y = [-%s, +%s]' \
+		self.W, self.H = 200.0, 200.0 * h / w
+		if self.units == "px":
+			if w > h: # width/height in internal coords  (min(w, h) -> 200)
+				self.W, self.H = 200.0 * w / h, 200.0
+			else:
+				self.W, self.H = 200.0, 200.0 * h / w
+
+			if w != h:
+				print('internal coordinate system: x = [-%s, +%s],  y = [-%s, +%s]' \
 					% (R(self.W * 0.5), R(self.W * 0.5), R(self.H * 0.5), R(self.H * 0.5)))
 
-		# matrix that transforms from internal svginstr coords to UV coords
-		self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(self.W, -self.H).invert()]
+			# matrix that transforms from internal svginstr coords to UV coords
+			self.matrix_stack = [Matrix().translate(-0.5, -0.5).scale(self.W, -self.H).invert()]
+		else:
+			self.matrix_stack = [Matrix().translate(0,0)]
 
 		self.file = None
 		self.file = XML(filename, Global.indent, filename.endswith(".svgz") or \
@@ -393,10 +400,10 @@ class Instrument:
 		self.file.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '\
 				'"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">')
 		self.file.write()
-		self.file.write('<svg width="%spx" height="%spx" viewBox="%s %s %s %s" '\
+		self.file.write('<svg width="%s%s" height="%s%s" viewBox="%s %s %s %s" '\
 				'xmlns="http://www.w3.org/2000/svg" '\
 				'xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">' \
-				% (R(self.w), R(self.h), 0, 0, R(self.W), R(self.H)))
+				% (R(self.w), self.units, R(self.h), self.units, 0, 0, R(self.W), R(self.H)))
 
 		attributes = Global.attributes.copy()
 		attributes.update(args)
