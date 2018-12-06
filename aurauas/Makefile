@@ -1,7 +1,7 @@
 export PYTHONPATH=$$PYTHONPATH:../lib
 SVG2PNG=../bin/svg2png
 
-all: aura-asi1.png aura-asi2.png glass-pfd-horiz.png glass-pfd-main.png glass-pfd-parts.png glass-pfd-tapes.png torque.png res3-asi.png avionics-vcc.png main-volts.png volts.png amps.png power.png hdg.png hdg_hud.png
+all: aura-asi-bg.png aura-asi-kt.png aura-asi-mps.png glass-pfd-horiz.png glass-pfd-main.png glass-pfd-parts.png glass-pfd-tapes.png torque.png res3-asi.png avionics-vcc.png main-volts.png volts.png amps.png power.png hdg.png hdg_hud.png
 
 extra: battery gpslevel link
 

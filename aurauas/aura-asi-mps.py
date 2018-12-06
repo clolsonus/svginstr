@@ -16,9 +16,9 @@ Global.indent = '\t'
 
 
 try:
-	a = Instrument("aura-asi2.svg", 512, 512, "Aura ASI; " + __version__).fg_size(384, 384)
+	a = Instrument("aura-asi-mps.svg", 512, 512, "Aura ASI; " + __version__).fg_size(384, 384)
 
-        max_speed = 80
+        max_speed = 50
 	a.angle = lambda x: x * 340.0 / max_speed - 90.0
 
 	#-- face ------------------------------------------------------------------------
@@ -38,18 +38,14 @@ try:
 			#a.tick(red_line, 70, 99.5, 3.3, color = "#c00000")
 
 			if a.begin(font_size = 20, font_weight = "bold"):
-				a.at(41, -41).text("10")
-				a.at(64, 1).text("20")
-				a.at(50, 45).text("30")
-				a.at(11, 73).text("40")
-				a.at(-35, 62).text("50")
-				a.at(-61, 25).text("60")
-				a.at(-54, -25).text("70")
-				a.at(-24, -54).text("80")
+				a.at(53, -19).text("10")
+				a.at(46, 48).text("20")
+				a.at(-28, 63).text("30")
+				a.at(-58, 3).text("40")
 				a.end()
 
 			a.at(0, -25).text("AIRSPEED", font_size = 14)
-			a.at(0, 40).text("KTS", font_size = 15)
+			a.at(0, 40).text("MPS", font_size = 15)
 
 			#a.at(0, -30).screw(0.12, 30)
 			#a.at(0, 30).screw(0.12, 70)
