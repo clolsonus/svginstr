@@ -1,3 +1,17 @@
+CLO Update - Feb 19, 2023:
+
+For new projects I recommend you consider the python drawSvg library which has
+very similar functionality to this svginstr package.  This package is python 2
+with some str package trickiness for porting to python3, but drawSvg already
+exists for python 3.
+
+I have some personal instrument component drawings that are built using this
+package so it's not time to completely delete it, but I will have to dig up
+a copy of python 2 before I can edit/update any of the instrument graphics
+I have built here.
+
+Now I return you to your regularly scheduled README:
+
 svginstr is a set of classes that assist with the generation of instrument faces,
 which are written in the SVG (Scalable Vector Graphics) format, and can then be
 converted to any other format, such as PNG (Portable Network Graphics). The main
